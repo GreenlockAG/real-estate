@@ -1,11 +1,8 @@
 import { Link, useLocation } from 'wouter';
-import { BarChart3, AlertTriangle, FileText, Building } from 'lucide-react';
+import { Building } from 'lucide-react';
 import { useModules } from './hooks/useModules';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  'briefcase': BarChart3,
-  'alert-triangle': AlertTriangle,
-  'file-text': FileText,
   'building': Building,
 };
 
@@ -14,7 +11,7 @@ export default function Navigation() {
   const { enabledModules } = useModules();
 
   const getIcon = (iconName: string) => {
-    const Icon = iconMap[iconName] || BarChart3;
+    const Icon = iconMap[iconName] || Building;
     return Icon;
   };
 
@@ -24,7 +21,7 @@ export default function Navigation() {
       <div className="p-6 border-b border-border">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <BarChart3 className="h-6 w-6 text-primary-foreground" />
+            <Building className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-foreground">Investment Oversight</h1>

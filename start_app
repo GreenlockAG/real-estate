@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT_DIR"
+
+if [[ ! -d node_modules ]]; then
+  echo "Installing dependencies..."
+  npm install
+fi
+
+export PORT="${PORT:-5000}"
+echo "Starting app on port ${PORT}"
+exec npm run dev

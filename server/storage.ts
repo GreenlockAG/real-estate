@@ -497,4 +497,14 @@ class PostgresStorage implements IStorage {
   }
 }
 
-export const storage = new PostgresStorage();
+const hasDatabaseUrl =
+  typeof process.env.DATABASE_URL === "string" &&
+  process.env.DATABASE_URL.trim().length > 0;
+
+if (!hasDatabaseUrl) {
+  console.warn("DATABASE_URL is not set. Falling back to in-memory storage.");
+}
+
+export const storage: IStorage = hasDatabaseUrl
+  ? new PostgresStorage()
+  : new MemStorage();
