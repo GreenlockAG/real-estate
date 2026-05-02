@@ -1,0 +1,11 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+
+# Temporary work folders (ephemeral development files)
+# The README.md files in temp/ folders are tracked to explain their purpose
+**/temp/*
+!**/temp/README.md

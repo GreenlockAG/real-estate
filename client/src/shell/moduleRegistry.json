@@ -1,0 +1,87 @@
+{
+  "version": "1.0.0",
+  "modules": [
+    {
+      "id": "portfolio",
+      "name": "Portfolio Manager",
+      "description": "Track and analyze PE/VC portfolio investments, capital calls, distributions, and fund performance",
+      "route": "/portfolio",
+      "icon": "briefcase",
+      "enabled": true,
+      "order": 1,
+      "features": [
+        "Portfolio dashboard with customizable cards",
+        "Capital calls and distributions tracking",
+        "Fund performance metrics (TVPI, DPI, RVPI, IRR)",
+        "Data tables with filtering and sorting",
+        "AI-powered portfolio advisor"
+      ],
+      "apiPrefix": "/api/portfolio",
+      "status": "active"
+    },
+    {
+      "id": "risk",
+      "name": "Risk Monitoring",
+      "description": "Monitor portfolio concentration, liquidity, and performance risks with configurable alerts",
+      "route": "/risk",
+      "icon": "alert-triangle",
+      "enabled": true,
+      "order": 2,
+      "features": [
+        "Portfolio concentration risk analysis",
+        "Liquidity risk monitoring (capital call coverage)",
+        "Performance risk alerts (underperforming funds)",
+        "Risk threshold configuration",
+        "Risk event tracking and history"
+      ],
+      "apiPrefix": "/api/risk",
+      "status": "planned",
+      "plannedPhase": 4
+    },
+    {
+      "id": "wealth",
+      "name": "Wealth Executive Report",
+      "description": "Executive summaries and consolidated reports aggregating portfolio and risk data",
+      "route": "/wealth",
+      "icon": "file-text",
+      "enabled": true,
+      "order": 3,
+      "features": [
+        "Executive summary dashboard",
+        "Consolidated portfolio snapshot",
+        "Performance summaries (returns, IRR, multiples)",
+        "Risk summary with top alerts",
+        "Asset allocation breakdown",
+        "Printable/exportable report format"
+      ],
+      "apiPrefix": "/api/wealth",
+      "status": "planned",
+      "plannedPhase": 5
+    },
+    {
+      "id": "realestate",
+      "name": "Real Estate",
+      "description": "Multi-property real estate investor dashboard with portfolio overview and detailed property passports",
+      "route": "/real-estate",
+      "icon": "building",
+      "enabled": true,
+      "order": 4,
+      "features": [
+        "Portfolio summary with color-coded performance",
+        "Property valuation tracking (12 quarters)",
+        "IRR vs opportunity cost analysis",
+        "Growth rate vs regional benchmarks",
+        "Quarterly P&L breakdown",
+        "Multi-currency FX exposure tracking"
+      ],
+      "apiPrefix": "/api/realestate",
+      "status": "active"
+    }
+  ],
+  "metadata": {
+    "lastUpdated": "2025-01-29",
+    "currentPhase": 2,
+    "activeModules": 4,
+    "totalModules": 4
+  }
+}

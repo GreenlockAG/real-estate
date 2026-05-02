@@ -1,0 +1,73 @@
+High-level conceptual architecture
+Vision
+Deliver a modular Investment Oversight platform where each analytics capability is independently evolvable and disposable, while a shared visual language ensures a consistent user experience.
+
+Core principles
+
+Bounded contexts: each module (Risk, Portfolio, Fees, …) owns its domain end-to-end.
+Strong isolation: independent deployable units, independent data stores, and failure containment.
+Shared kernel: a versioned, minimal UI/viz library used by all modules and the shell.
+Runtime composition: the app is assembled at run time from registered modules, not compile-time links.
+Contract-first: interactions happen only through stable, versioned contracts (APIs/events).
+
+
+System decomposition
+
+App shell: responsible for authentication, navigation, layout, and loading modules at runtime from a module registry.
+Microfrontends: one per analytics module; mounted by the shell under assigned routes; no cross-imports between modules.
+Module services: one backend per module exposing narrowly scoped APIs; no direct DB sharing.
+Datastores: one database per module; the module is the sole writer and owner of its schema.
+Cross-cutting layer: centralized identity, policy enforcement, and observability applied consistently across modules.
+
+
+Frontend model
+
+Shell provides the frame and a runtime “module registry” that declares which modules exist and how to load them.
+Each module UI consumes the shared viz library for charts, theming, and primitives, ensuring consistency without tight coupling.
+Removing a module = removing its registry entry; the shell simply stops presenting it.
+
+
+Backend and data model
+
+Each module service encapsulates its logic and data; it exposes use-case–oriented endpoints.
+Cross-module needs are met via:
+Synchronous contracts: call another module’s API through a well-defined interface.
+Asynchronous contracts: publish domain events for other modules to react to and build their own read models.
+
+
+No shared tables or schemas; any read across domains happens via contracts or replicated read models.
+
+
+Integration and resilience
+
+Contracts are versioned; backward compatibility is preserved during rollouts.
+Isolation by default: timeouts, retries, and circuit breakers prevent one module’s failure from cascading.
+Health probes per module; the shell reflects module availability in the UI.
+
+
+Deployment and isolation
+
+Each module (UI + service + DB) is packaged and deployed independently.
+The shared viz library is a versioned artifact; modules choose when to upgrade.
+Deleting a module does not affect others because nothing is statically linked: the shell composes modules at runtime.
+
+
+Governance and evolution
+
+API and event catalogs define allowed interactions; linting/CI enforce no cross-boundary imports.
+Data stewardship: each module maintains its migrations and data retention independently.
+Release discipline: semantic versioning for the shared library and for module contracts.
+
+
+Operational concerns
+
+Centralized identity provider issues tokens; each service validates and enforces authorization locally.
+Unified observability: traces, metrics, and logs tagged by module for per-module SLOs and budgets.
+Auditability: append-only audit streams emitted by each module, correlatable across the system.
+
+
+Success criteria
+
+You can add, upgrade, or remove a module without rebuilding or redeploying the others.
+A module can fail or be offline without breaking the rest of the application.
+The shared visual language remains consistent via the versioned viz library, yet does not block module autonomy.

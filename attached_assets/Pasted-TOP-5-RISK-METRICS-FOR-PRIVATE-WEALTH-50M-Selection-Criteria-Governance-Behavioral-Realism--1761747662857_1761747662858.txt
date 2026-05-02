@@ -1,0 +1,331 @@
+TOP 5 RISK METRICS FOR PRIVATE WEALTH ( $ 50M+)
+Selection Criteria: Governance + Behavioral Realism + Actionability
+Private wealth is NOT an endowment or pension. Key differences:
+
+Principal psychology: Family members see marks monthly/quarterly and react emotionally
+Liquidity constraints: Can't always rebalance optimally; capital calls create forced timing
+Governance simplicity: No 40-person risk committee; decisions made by 1-3 people
+Longevity risk: Multi-generational; must survive 50+ years of regime shifts
+Spending inflexibility: Can't cut distributions 30% like an endowment can
+
+
+THE TOP 5 METRICS (Ranked by Decision Impact)
+#1: MAX DRAWDOWN (DD) — "The Panic Threshold"
+What: Peak-to-trough portfolio lossWhy It's #1 for Private Wealth:
+
+Behavioral anchor: Families fire advisors/abandon plans based on DD, not ES or Sharpe
+Regime-agnostic: Works across bull/bear/inflation cycles
+Governance clarity: "We size the portfolio so DD stays under 25%" is understandable
+
+How to Use:
+
+
+
+DD Level
+Principal Psychology
+Typical Action
+
+
+
+0-10%
+"Normal volatility"
+None
+
+
+10-20%
+Uncomfortable; asking questions
+Increase communication frequency
+
+
+20-30%
+High stress; considering changes
+Emergency IC meeting; rebalance if pre-planned
+
+
+30%+
+Panic; often fire advisor or abandon strategy
+Avoid at all costs
+
+
+Target for  $ 50M+ FO:
+
+Conservative: 15-20% max DD (65/35 equity/hedge portfolio)
+Moderate: 20-25% max DD (70/30)
+Growth-oriented: 25-30% max DD (75/25)
+
+Critical Enhancement:
+
+Track recovery time alongside DD: "We hit -18% in Q1 2020 but recovered in 4 months" vs. "We hit -22% in 2008 and took 36 months"
+
+
+#2: LIQUIDITY COVERAGE RATIO (LCR) — "Can We Survive Without Forced Sales?"
+What: Available liquidity ÷ Next 12-24 months net cash needs (calls + distributions + expenses)Why It's #2:
+
+Death spiral prevention: Prevents selling Growth/Hedges at worst possible time
+Private asset enabler: Lets you hold illiquid positions through cycles
+Behaviorally stabilizing: Knowing "we have 18 months of liquidity" reduces panic
+
+How to Calculate:
+LCR = (T-bills + Short IG + Available credit lines) 
+      ÷ (Next 12mo capital calls + distributions + expenses - expected distributions from PE/RE)
+
+Target: ≥ 1.5x (conservative); ≥ 1.25x (moderate)
+Stress Test:
+
+Scenario 1: All unfunded PE calls + no distributions for 12 months
+Scenario 2: Above + unexpected  $ 5M principal need (medical, divorce, investment opportunity)
+
+Decision Rules:
+
+
+
+LCR
+Action
+
+
+
+<1.0x
+RED ALERT: Stop new PE commitments; build T-bill ladder immediately
+
+
+1.0-1.25x
+CAUTION: Limit new illiquid commitments to <5% portfolio/year
+
+
+1.25-1.75x
+NORMAL: Opportunistic PE/credit as available
+
+
+>1.75x
+EXCESS: Consider trimming cash drag; increase duration in Hedges sleeve
+
+
+
+#3: CRISIS P&L — "What Happens in 2008/2020/1970s Redux?"
+What: Portfolio gain/loss in deterministic historical crisis scenariosWhy It's #3:
+
+Forward-looking DD proxy: Shows how current portfolio would have behaved historically
+Hedge validation: Tests if your Hedges sleeve actually works when needed
+Board communication: Families understand "2008" better than "3-sigma event"
+
+Standard Crisis Scenarios for Private Wealth:
+
+
+
+Scenario
+Equities
+Bonds (10y)
+Credit Spreads
+Commodities
+PE/RE
+Your Target P&L
+
+
+
+2008 (Lehman)
+-40%
++20% (flight to quality)
++400bp
+-35%
+-25% (lag)
+-15% to -20%
+
+
+2020 (COVID)
+-30% → +70%
++10%
++300bp → -200bp
+-20% → +30%
+-15% → +20%
+-12% to -18% (trough)
+
+
+1970s (stagflation)
+-45% (real)
+-35% (real)
++300bp
++200%
+-20% (real)
+-10% to -15% (TIPS/CTA rescue)
+
+
+2022 (rate shock)
+-18%
+-17%
++150bp
++15%
+-12% (mark lag)
+-8% to -12%
+
+
+Flash crash (2010/2015)
+-15% intraday
++5%
++100bp
+-10%
+0% (no mark)
+-5% to -8%
+
+
+How to Use:
+
+Run quarterly with current holdings
+If any scenario > -25%, rebalance Hedges sleeve or trim Growth
+Share with principals: "Here's what would have happened in 2008 with today's portfolio"
+
+
+#4: EXPECTED SHORTFALL (ES95 or ES97.5) — "Average Loss in Bad Years"
+What: Mean return in worst 5% (or 2.5%) of Monte Carlo outcomesWhy It's #4 (Not #1):
+
+Better than VaR: Captures tail severity, not just threshold
+Optimizer-friendly: Can minimize ES in portfolio construction
+Complements DD: DD is "worst single path"; ES is "average of worst paths"
+
+Target for  $ 50M+ FO:
+
+
+
+Risk Profile
+ES95 Target
+ES97.5 Target
+Implied DD
+
+
+
+Conservative
+-10% to -12%
+-14% to -16%
+~20% max
+
+
+Moderate
+-12% to -15%
+-16% to -20%
+~25% max
+
+
+Growth
+-15% to -18%
+-20% to -24%
+~30% max
+
+
+Critical Nuance:
+
+Use regime-switching Monte Carlo (not single correlation matrix)
+De-smooth PE/credit volatilities (multiply reported vol by 1.5-2.0x)
+Report ES95 and ES97.5 to show tail thickness
+
+Decision Rule:
+
+If ES97.5 > 1.3x ES95, you have fat tails → increase Hedges allocation or reduce PE leverage
+
+
+#5: CORRELATION STRESS INDEX (CSI) — "Will My Hedges Work When I Need Them?"
+What: Rolling 12-month correlation between Growth sleeve and Hedges sleeveWhy It's #5:
+
+Early warning system: Detects when diversification is breaking down
+Hedge effectiveness: Validates that duration/TIPS/CTA are still negatively correlated to equities
+Actionable: Triggers tactical shifts in Hedges sleeve composition
+
+How to Calculate:
+CSI = Rolling 12-month correlation (Growth sleeve returns, Hedges sleeve returns)
+
+Target: CSI < -0.3 (strong negative); Warning: CSI > -0.1
+Stress Thresholds:
+
+
+
+CSI Value
+Interpretation
+Action
+
+
+
+< -0.4
+Excellent diversification
+Maintain allocation
+
+
+-0.4 to -0.2
+Normal regime
+Monitor quarterly
+
+
+-0.2 to 0
+Weakening hedge
+Tilt Hedges toward CTA/tail; reduce duration if inflation rising
+
+
+0 to +0.3
+ALERT: 2022-style regime (stocks+bonds down)
+Shift Hedges: 50% CTA/trend + 30% TIPS + 20% commodities
+
+
+> +0.3
+Crisis of diversification
+Emergency rebalance; consider gold/vol overlay
+
+
+Example:
+
+2010-2019: CSI averaged -0.35 (bonds rallied when stocks fell)
+2022: CSI spiked to +0.65 (both fell together)
+Action in 2021 (if monitoring): Reduce duration from 40% → 25%; add CTA from 10% → 20%
+
+
+HOW TO USE THE TOP 5 TOGETHER
+Quarterly Risk Dashboard for  $ 50M+ FO
+
+
+
+Metric
+Current
+Target
+Status
+Action if Breached
+
+
+
+Max DD (trailing 36mo)
+-18%
+<20%
+✅ GREEN
+None
+
+
+LCR (12mo forward)
+1.4x
+≥1.25x
+✅ GREEN
+None
+
+
+Crisis P&L: 2008 scenario
+-19%
+<-20%
+⚠️ YELLOW
+Add 3% duration or reduce PE commitment pace
+
+
+ES97.5 (1-year forward)
+-17%
+<-18%
+✅ GREEN
+None
+
+
+CSI (12mo rolling)
+-0.28
+<-0.20
+✅ GREEN
+None
+
+
+Decision Tree:
+
+If LCR < 1.25x: STOP — Build liquidity before anything else
+If DD or Crisis P&L > target: Rebalance Hedges or trim Growth
+If CSI > -0.1: Shift Hedges composition (more CTA/TIPS, less duration)
+If ES97.5 > 1.3x ES95: Reduce tail risk (cut PE leverage, add tail hedge)
+If all GREEN: Opportunistic rebalancing only

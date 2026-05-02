@@ -1,0 +1,222 @@
+Build Brief: “Risk Monitoring” — Start Simple, Data First
+
+Goal:
+Implement a minimal, evolvable data layer to capture user inputs for a 4-part risk workflow (Setup → Parameter Pack → Analysis → Governance). Replit can choose stack and UI. Prioritize clean schema, versioning, auditability, and easy future extension.
+
+Core Objects (neutral, framework-agnostic)
+
+Organization: container for tenants and users.
+
+User: role-based access (admin/editor/viewer).
+
+Portfolio: belongs to Organization; base currency, AUM.
+
+Sleeve: normalized sub-allocations for a Portfolio.
+
+PrivateExposure: % PE, Private Credit, Core Infra; reporting lag; smoothing.
+
+GovernanceConstraint: max DD %, horizon months, notes.
+
+LiquidityNeeds: next-12m calls, op cash, reserve rule.
+
+RebalancingPolicy: band (pp) and frequency.
+
+FXOverlay: hedge ratios and optional CHF buffer.
+
+RiskParameterPack (versioned): vols/returns/hedge effectiveness; CorrelationMatrix; StressScenario.
+
+SimulationRun: references a ParameterPack; stores inputs snapshot (immutable).
+
+SimulationResultMetric: values (VaR/CVaR/DD/etc.) by scope (portfolio/sleeve).
+
+ScenarioResult: per stress scenario outcomes.
+
+GovernanceReview: compliance vs constraints + recommendations.
+
+Document: stored reports/memos (URI or blob).
+
+AuditLog: before/after diffs for any mutation.
+
+Minimal Enumerations
+
+Sleeve.type: GROWTH | CREDIT | DURATION | TIPS | CTA | COMMODITIES | DIVERSIFIERS | REAL_ASSETS | LIQUIDITY
+
+RebalancingPolicy.frequency: MONTHLY | QUARTERLY | ANNUAL
+
+RiskParameterItem.kind: VOL | RETURN | HEDGE_EFF | OTHER
+
+SimulationRun.engine: MONTE_CARLO | HISTORICAL | STRESS_ONLY
+
+SimulationResultMetric.metric: VAR | CVAR | MAX_DD | DD_PROB | VOL | LIQ_BUFFER_DAYS
+
+StressScenario.category: MACRO | RATE | CREDIT | COMMODITY | FX | CUSTOM
+
+Storage Model Options (Replit decides)
+Option A — Relational (starter DDL sketch, not stack-specific)
+
+Tables as per objects above (1:1).
+
+Text/JSON columns for flexible fields: meta_json, *_snapshot_json, *_json.
+
+Versioning: unique (portfolio_id, version) on RiskParameterPack.
+
+Soft constraints via CHECKs where supported (enums, ranges).
+
+Option B — Document/NoSQL (starter shapes)
+
+organizations: { _id, name, createdAt }
+
+users: { _id, orgId, email, name, role, createdAt }
+
+portfolios:
+
+{
+  "_id": "...",
+  "orgId": "...",
+  "name": "Core FO",
+  "baseCurrency": "USD",
+  "aumMillions": 450,
+  "chfSpendingNote": "…",
+  "sleeves": [
+    {"type":"GROWTH","targetWeightPct":55,"currentWeightPct":52,"notes":""},
+    {"type":"CREDIT","targetWeightPct":15,"currentWeightPct":17}
+    // all 9 types present, unique per portfolio
+  ],
+  "privateExposure": {"pePct":15,"privateCreditPct":8,"coreInfraPct":5,"navLagQuarters":2,"smoothing":true},
+  "governanceConstraint": {"maxDdPct":30,"horizonMonths":24,"notes":""},
+  "liquidityNeeds": {"next12mCallsM":12,"operatingCashPerYearM":4,"reserveMultiple":1.5,"reserveM":null},
+  "rebalancingPolicy": {"bandPp":5,"frequency":"QUARTERLY","notes":""},
+  "fxOverlay": {"dmBondsHedgePct":90,"equitiesHedgePct":50,"otherHedgePct":0,"chfLiquidityBufferMonths":6},
+  "createdAt": "..."
+}
+
+
+parameterPacks:
+
+{
+  "_id":"...",
+  "portfolioId":"...",
+  "version":1,
+  "label":"Base v1",
+  "vols":[{"sleeveType":"GROWTH","value":18.0}],
+  "returns":[{"sleeveType":"GROWTH","value":6.0}],
+  "hedgeEff":[{"sleeveType":"EQUITIES","value":0.6}],
+  "correlationMatrix":{"labels":["GROWTH","CREDIT", "..."],"matrix":[[1,0.2],[0.2,1]]},
+  "stressScenarios":[{"name":"GFC","category":"MACRO","horizonDays":60,"shock":{"GROWTH":-0.35,"CREDIT":-0.12}}],
+  "createdBy":"userId",
+  "createdAt":"..."
+}
+
+
+simulationRuns:
+
+{
+  "_id":"...",
+  "portfolioId":"...",
+  "packId":"...",
+  "engine":"MONTE_CARLO",
+  "seed":123,
+  "paths":20000,
+  "horizonDays":365,
+  "inputsSnapshot": { /* full copy of portfolio + parameterPack at run time */ },
+  "createdBy":"userId",
+  "createdAt":"..."
+}
+
+
+simulationResults:
+
+{
+  "_id":"...",
+  "runId":"...",
+  "metrics":[
+    {"scope":"PORTFOLIO","metric":"MAX_DD","horizonDays":365,"value":-0.27},
+    {"scope":"SLEEVE","sleeveType":"GROWTH","metric":"VAR","horizonDays":252,"value":-0.12}
+  ],
+  "scenarioResults":[
+    {"scenarioName":"GFC","scope":"PORTFOLIO","metric":"PnL","value":-0.22}
+  ]
+}
+
+
+governanceReviews:
+
+{
+  "_id":"...",
+  "portfolioId":"...",
+  "runId":"...",
+  "constraintRef":{"maxDdPct":30,"horizonMonths":24},
+  "compliant": true,
+  "breaches": [],
+  "recommendations": ["No change; monitor liquidity buffer."],
+  "createdAt":"..."
+}
+
+
+auditLogs: { _id, orgId, userId, entity, entityId, action, before, after, createdAt }
+
+Invariants & Validation (apply regardless of storage)
+
+Sleeves: must include all 9 types; enforce uniqueness (portfolio, type).
+
+Weights: warn if total deviates from 100% by >1pp (store warning on save).
+
+Governance: 0 ≤ maxDdPct ≤ 100, horizonMonths ∈ {12,18,24,36}.
+
+Liquidity: require at least one of reserveMultiple or reserveM.
+
+FX hedge ratios: each in [0,100].
+
+Correlation matrix: square, symmetric, unit diagonal, entries in [-1,1].
+
+Parameter pack version: unique per portfolio.
+
+Simulation run snapshot: immutable copy of portfolio + parameter pack at run time.
+
+Minimal Actions (API or scripts—Replit chooses)
+
+Create Portfolio (Part 1): persist all inputs atomically; write AuditLog.
+
+Create Parameter Pack (Part 2): validate matrix/scenarios; enforce version uniqueness.
+
+Create Simulation Run (Part 3): capture immutable inputsSnapshot.
+
+Create Governance Review (Part 4): mark compliant using a stub rule (e.g., MAX_DD ≤ maxDdPct).
+
+Get Portfolio Summary: return sleeves, constraints, liquidity, fx overlay, latest pack version.
+
+Seed Data (simple)
+
+One Organization, two Users.
+
+One Portfolio with all 9 sleeves (weights sum ~100%).
+
+One ParameterPack version=1 with small 9×9 corr matrix and 2 stress scenarios.
+
+One SimulationRun with a handful of metrics.
+
+One GovernanceReview (compliant).
+
+Acceptance (light, stack-agnostic)
+
+✅ Part 1 save is transactional and produces an audit record.
+
+✅ Parameter pack with invalid matrix fails validation with a clear message.
+
+✅ Simulation run stores a full inputsSnapshot that does not change if the portfolio later changes.
+
+✅ Governance review computes a boolean compliant against stored results and constraint.
+
+✅ A lightweight “export” endpoint/command can dump a portfolio (Part 1) as JSON.
+
+Future-proofing (don’t implement now)
+
+Role checks (admin/editor/viewer).
+
+Import/export CSV for sleeves.
+
+Blob storage for Documents (memos, reports).
+
+Indexes for common lookups (by org, portfolio, version, run date).
+
+Instruction to Replit: Choose the simplest path (files, SQLite, or a doc store) and scaffold only what’s needed to persist and retrieve these objects plus validations and seed data. No UI requirements; a minimal CLI or endpoints are fine.

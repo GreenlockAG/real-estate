@@ -1,0 +1,173 @@
+GUARDRAILS.md
+Purpose
+
+These guardrails enforce a clean architecture, swappable UI vendors, and secure practices for the PE/VC Portfolio Manager app.
+
+1. Core Principles
+
+Airtable is master: the local DB is a read-only mirror.
+
+Strict separation of concerns:
+
+Metrics (Python calculations)
+
+API layer (FastAPI endpoints)
+
+Viz blocks (frontend React modules)
+
+Vendor independence: UI libraries (tables, charts) are wrapped in thin adapters with a stable API.
+
+Clean repo: no temp/debug files in root; use dev/.
+
+Secure by default: advisor is read-only, inputs validated, SQL parameterized.
+
+2. Repository Layout
+.
+├─ app.py
+├─ metrics/                # Python metric functions (pure)
+│  ├─ capital_calls.py
+│  ├─ distributions.py
+│  ├─ net_cashflow.py
+│  ├─ commitment_paidin.py
+│  ├─ nav_breakdown.py
+│  └─ performance_ratios.py
+├─ static/
+│  ├─ index.html
+│  ├─ styles.css
+│  ├─ app.js
+│  ├─ config/
+│  │  └─ vizConfig.js      # vendor flags + shared defaults
+│  ├─ ui/                  # adapters for swappable vendors
+│  │  ├─ table/
+│  │  │  ├─ index.js
+│  │  │  └─ antdTable.js
+│  │  └─ chart/
+│  │     ├─ index.js
+│  │     └─ echarts.js
+│  ├─ components/          # shared UI panels
+│  │  ├─ TabsRoot.js
+│  │  ├─ SetupGate.js
+│  │  ├─ SyncPanel.js
+│  │  ├─ DataTable.js
+│  │  └─ AdvisorPanel.js
+│  └─ viz/                 # one folder per viz block
+│     ├─ CapitalCalls/
+│     ├─ Distributions/
+│     ├─ NetCashflow/
+│     ├─ NavBreakdown/
+│     └─ RatiosTable/
+├─ dev/                    # temp/debug only
+│  ├─ scratch/
+│  ├─ scripts/
+│  └─ logs/
+├─ README.md
+└─ requirements.txt
+
+3. Adapters (Swappable Vendors)
+Table Adapter API
+<TableView
+  columns={[{ key, title, dataIndex }]}
+  rows={[{ key, ...fields }]}
+  pageSize={20}
+  onPageChange?(pageNumber)
+  loading={boolean}
+  emptyText="No data"
+/>
+
+Chart Adapter API
+<LineSeries
+  series={[{ name, data: [[tsMs, value], ...] }]}
+  xType="time" | "category"
+  yType="value" | "log"
+  options?={{ legend, tooltip, yMin, yMax }}
+  height={360}
+/>
+
+<PieSeries
+  data={[{ name, value }]}
+  options?={{ legend, tooltip }}
+  height={360}
+/>
+
+Vendor Flags
+
+static/config/vizConfig.js:
+
+export const VENDORS = {
+  chart: 'echarts', // or 'chartjs', ...
+  table: 'antd',    // or 'mantle', ...
+};
+
+
+Adapters read VENDORS and re-export the chosen implementation.
+👉 To swap vendors, update the flag or replace adapter files only.
+
+4. Viz Blocks
+
+Each block lives in its own folder under static/viz/<BlockName>/.
+
+Must render inside a .viz-block card (light background, rounded corners, shadow).
+
+Allowed imports:
+
+static/ui/* (table/chart adapters)
+
+static/config/vizConfig.js (defaults, vendor flags)
+
+static/components/* (shared shells)
+
+❌ No cross-block imports.
+
+5. Security Rules
+
+Advisor (/api/ask) is read-only; no arbitrary Python.
+
+Validate all table/column params against schema.
+
+Use parameterized SQL, never string concatenation.
+
+Rate-limit advisor requests.
+
+CORS & security headers enabled.
+
+6. Dev & Debug
+
+All temp/debug scripts go under dev/.
+
+.gitignore must exclude:
+
+data.db
+
+dev/*
+
+__pycache__/ and *.pyc
+
+any local secrets
+
+7. Health & Status
+
+/api/healthz reports:
+
+secrets_ok
+
+db_ok
+
+mirrored tables
+
+last sync timestamp
+
+UI header shows Secrets status and Last sync time.
+
+✅ Acceptance
+
+SetupGate → Deploy → Sync → Explore flow.
+
+One Airtable base, multiple table IDs supported.
+
+Viz blocks modular, .viz-block style enforced.
+
+UI vendors swappable via adapters.
+
+Repo stays clean (dev/ for scratch only).
+
+Secure defaults applied end-to-end.

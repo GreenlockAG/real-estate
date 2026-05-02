@@ -1,0 +1,14 @@
+Executive Wealth Reporting — Pane Architecture
+Pane	Pane Name	Data Description	Time Horizon (dd-mmm-yyyy)	Chart Type	X-Axis	Y-Axis	Color Palette
+1	Wealth Snapshot	Invested capital, FX impact, total profit, current NAV	01-Jan-2015 → Today	KPI Tiles	—	USD	Dark green (NAV), blue (invested), gold (FX), black (profit)
+2	Portfolio Value vs Contributions	Portfolio NAV vs net invested capital with ±10% cash scenarios	01-Jan-2015 → Today	Multi-layer stacked area + line overlay	Date	USD value	Dark green (NAV), teal (deposit +10%), grey (deposit), light grey (deposit −10%)
+3	Annual Performance	Calendar-year return & profit	01-Jan-2015 → 31-Dec-2025	Dual-axis bar + label	Year end (date)	Return % / Profit USD	Green (positive), red (negative)
+4	Monthly Performance (Current Year)	Monthly return, FX impact, and net flows	01-Jan-2025 → 31-Dec-2025	Combo: line + clustered bars	Month	% return & USD change	Black (NAV), grey (return), blue (FX), teal (net flows)
+5	Assets by Custodian	Portfolio value by bank / broker	As of latest valuation date	Horizontal sorted bar chart	Custodian name	USD NAV	Green gradient by size
+6	Asset Allocation Path	Allocation today, in 12 months, and target	01-Jan-2025, 01-Jan-2026, Target	Triple stacked vertical columns	Allocation date	% of portfolio	Black (equity), dark green (PE), blue (alts), grey (bonds), gold (hedge), red (liquidity)
+7	Manager & Strategy Exposure	Capital deployed by fund and asset class	As of latest valuation date	Grouped vertical bar chart	Fund / manager	USD invested	Grey (bonds), black (equity), green (PE), blue (alts), red (cash), gold (hedge)
+8	Performance by Position	YTD and since-purchase returns by holding	Since each purchase date → Today	Heat-map performance table	Instrument name	% return	Green → red gradient
+9	Private Market Performance	PE & VC value vs invested capital	Fund inception → Today	Dual-bar MOIC chart	Fund	Invested USD vs Current USD	Dark green (value), grey (cost)
+10	Custody & Bank Fees	Fees paid by bank over time	01-Jan-2020 → Today	Stacked vertical bar chart	Year / Quarter	USD fees	Grey (custody), red (fees), black (total)
+11	Cash by Bank & Currency	Cash balances split by bank and FX	As of latest valuation date	Matrix table + conditional heatmap	Bank	Currency amount	Blue (USD), green (EUR), grey (CHF), orange (DKK)
+12	FX Exposure	Portfolio currency risk	As of latest valuation date	Stacked horizontal bar	Currency	% of NAV	Blue (USD), green (EUR), grey (CHF), black (GBP), orange (DKK)

@@ -1,0 +1,65 @@
+Three-Layer Architecture
+Layer 1: Shell (Orchestrator)
+
+Thin container that loads modules dynamically
+Knows what modules exist but doesn't contain their logic
+Provides navigation framework and authentication context
+
+Layer 2: Shared UI Library
+
+Standalone npm package consumed by all modules
+Contains NO business logic, only presentation components
+Version-controlled independently
+Modules depend on it, it depends on nothing
+
+Layer 3: Independent Modules
+Each module is a vertical slice containing:
+
+Frontend micro-app (React)
+Backend service (API)
+Dedicated database
+
+Modules are:
+
+Physically separate folders
+Can be deleted without affecting others
+Communicate only through APIs (no shared databases)
+Import shared UI library as external dependency
+
+Key Architectural Principles
+1. Bounded Contexts
+Each module owns:
+
+Its own data schema
+Its own business rules
+Its own deployment lifecycle
+
+2. Dependency Direction
+Shell → Modules (discovers them)
+Modules → Shared UI (imports it)
+Shared UI → Nothing (pure presentation)
+3. Communication
+
+Frontend-to-Frontend: None (through shell routing only)
+Backend-to-Backend: REST APIs or event messages
+No direct database access between modules
+
+4. Deployment Units
+Unit 1: Shared UI Library (deployed as package)
+Unit 2: Shell + Module 1 + Service 1 + DB 1
+Unit 3: Module 2 + Service 2 + DB 2
+Unit 4: Module 3 + Service 3 + DB 3
+Why This Works for Your Goals
+Containerization: Physical folder separation + independent services
+Deletability: Remove a module folder = module gone, others unaffected
+Shared UI: Published as package, not embedded in modules
+Database Isolation: Each service connects to different database instance
+Mental Model
+Think of it like a shopping mall:
+
+Shell = The mall structure (hallways, directory)
+Shared UI = Building standards (doors, lighting, signage)
+Modules = Individual stores (completely independent businesses)
+Databases = Each store's private inventory system
+
+Tearing down one store doesn't affect the mall or other stores.

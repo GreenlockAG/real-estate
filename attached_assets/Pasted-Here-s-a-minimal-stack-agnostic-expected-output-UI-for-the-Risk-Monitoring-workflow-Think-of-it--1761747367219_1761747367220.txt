@@ -1,0 +1,176 @@
+Here’s a minimal, stack-agnostic “expected output UI” for the Risk Monitoring workflow. Think of it as the target UX your team (or Replit AI) can render in any framework. It’s intentionally simple now, with clear upgrade paths.
+
+Top-level layout
+
+Header: Portfolio picker • Version chips (Part 1 config v#, Param Pack v#) • “Export JSON / PDF”
+
+Nav (4 tabs): Setup → Parameters → Analysis → Governance
+
+Right rail (optional): Audit log (last 10 actions), validation warnings
+
+1) Setup (Part 1 — Inputs)
+
+Goal: capture & confirm portfolio definitions.
+
+Output UI elements
+
+Sleeve weights table (editable grid)
+
+Columns: Sleeve • Target % • Current % • Notes
+
+Footer: Total = 100% ✅ / warning if off by >1pp
+
+Private exposure card (PE %, Private Credit %, Core Infra %, NAV lag, smoothing)
+
+Governance card (Max DD %, Horizon months)
+
+Liquidity needs card (12-mo calls, Op cash, Reserve multiple/$)
+
+Rebalancing policy (band ±pp, frequency)
+
+FX & overlay (hedge ratios, CHF buffer)
+
+Nice touches
+
+Banner: “Saved • v3 (Oct 29, 2025, 10:12)”
+
+Button: “Freeze Inputs → Create Snapshot for Run” (confirms data integrity)
+
+Micro-wireframe
+
+[ Setup ✓ ]  [ Parameters ]  [ Analysis ]  [ Governance ]
+
+Sleeves
+┌───────────────────────────────┬───────────┬───────────┬─────────┐
+│ Sleeve                        │ Target %  │ Current % │ Notes   │
+├───────────────────────────────┼───────────┼───────────┼─────────┤
+│ GROWTH                        │   45.0    │   45.0    │         │
+│ CREDIT                        │   25.0    │   25.0    │         │
+│ DURATION                      │    0.0    │    0.0    │         │
+│ ... (all 9)                   │           │           │         │
+├───────────────────────────────┴───────────┴───────────┴─────────┤
+Total: 100.0%   ✅
+
+2) Parameters (Part 2 — Risk Pack)
+
+Goal: show the active Risk Parameter Pack and versions.
+
+Output UI elements
+
+Pack selector (v1, v2, …) with created-by and timestamp
+
+Vol/Return tables by sleeve
+
+Correlation heatmap (matrix with tooltips)
+
+Stress scenarios list (name, category, horizon, quick view of shocks)
+
+Actions
+
+“Validate pack” (matrix symmetric, unit diagonal, ranges ok)
+
+“Set as active for next run”
+
+Micro-wireframe
+
+Active Parameter Pack: v1  [ ▼ ]    Created by: Danil • Oct 29, 2025
+Volatilities (%)
+GROWTH 18.0 | CREDIT 7.5 | ...  (table)
+Returns (%)
+GROWTH 6.0  | CREDIT 3.0 | ...  (table)
+[ Heatmap: Correlations ]     [ Stress Scenarios ▸ GFC ▸ Rates+50bps ▸ Custom... ]
+
+3) Analysis (Part 3 — Runs)
+
+Goal: launch runs and view results.
+
+Output UI elements
+
+Run launcher: Engine (Monte Carlo / Historical / Stress-only), Paths, Horizon, Seed
+
+Runs list (cards):
+
+Run ID, timestamp, engine, Param Pack v#, Inputs Snapshot chip
+
+Status: Completed / Failed / In progress
+
+Run details view (when opened):
+
+Key portfolio metrics (for horizon): Max DD, VaR, CVaR, Vol, DD probability
+
+By sleeve table (same metrics, per sleeve)
+
+Scenario outcomes (PnL/Drawdown per stress scenario)
+
+Result downloads (CSV/JSON)
+
+Optional charts (simple)
+
+Distribution of returns (histogram)
+
+Drawdown curve (worst path)
+
+Scenario bar chart (baseline vs stressed)
+
+Micro-wireframe
+
+[ + New Run ] Engine: Monte Carlo | Paths: 20,000 | Horizon: 365d | Seed: 42 [ Start ]
+
+Recent Runs
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Run #014  • Completed  • MC • Horizon 365d • Pack v1 • Snapshot s#27       │
+│ Key: MaxDD 27% | VaR95 -12% | CVaR95 -16% | Vol 9.8% | DD Prob(>30%) 8%    │
+│ [ View details ]  [ Download JSON ]                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+4) Governance (Part 4 — Review)
+
+Goal: compare outcomes vs governance, record decision, export memo.
+
+Output UI elements
+
+Compliance banner
+
+Compliant ✅ (MaxDD 27% ≤ 30% @ 24m)
+
+or Breach ❌ with list of breaches (what, where, by how much)
+
+Recommendations panel (bulleted actions: rebalance bands, hedge tweaks, liquidity buffer)
+
+Board-Ready Memo preview (auto-filled summary)
+
+Inputs summary (Part 1), Pack v#, latest run metrics, compliance status, recommendations
+
+Buttons: Export PDF, Export DOCX, Copy to clipboard
+
+Micro-wireframe
+
+Governance Status:  ✅ Compliant
+- Constraint: Max DD ≤ 30% over 24 months
+- Latest Run #014 (Oct 29, 2025): Max DD 27%
+
+Recommendations
+• Maintain bands; monitor CREDIT sleeve drift weekly.
+• Keep CHF buffer at 6 months; reassess if calls rise >20%.
+
+[ Preview Board Memo ]  [ Export PDF ]  [ Export JSON ]
+
+Cross-cutting outputs
+
+Version chips: Setup v#, Pack v#, Run ID, Snapshot ID (click to view diff)
+
+Audit log: “who changed what, when,” link to before/after JSON
+
+Exports: JSON for every entity; PDF/DOCX for the Governance memo
+
+Validation warnings (non-blocking): shown as yellow toasts and logged
+
+“Done = Good” acceptance (UI behavior)
+
+Setup tab visually confirms weights = 100% and shows any warnings.
+
+Parameters tab renders correlation heatmap and scenario list from stored pack.
+
+Analysis tab stores and displays immutable inputs snapshot per run.
+
+Governance tab automatically computes pass/fail against the latest run + constraint and generates a memo preview.

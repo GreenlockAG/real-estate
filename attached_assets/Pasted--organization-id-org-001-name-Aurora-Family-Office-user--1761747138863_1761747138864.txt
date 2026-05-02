@@ -1,0 +1,62 @@
+{
+  "organization": {
+    "id": "org-001",
+    "name": "Aurora Family Office"
+  },
+  "user": {
+    "id": "user-001",
+    "organizationId": "org-001",
+    "email": "danil@aurorafo.com",
+    "name": "Danil Knyazev",
+    "role": "admin"
+  },
+  "portfolio": {
+    "id": "port-001",
+    "organizationId": "org-001",
+    "name": "Core Governance Portfolio",
+    "baseCurrency": "USD",
+    "aumMillions": 350,
+    "chfSpendingNote": "CHF spending 2M/year equivalent",
+    "createdAt": "2025-10-29T00:00:00Z",
+    "sleeves": [
+      { "type": "GROWTH",       "targetWeightPct": 45.0, "currentWeightPct": 45.0, "notes": "" },
+      { "type": "CREDIT",       "targetWeightPct": 25.0, "currentWeightPct": 25.0, "notes": "" },
+      { "type": "DURATION",     "targetWeightPct": 0.0,  "currentWeightPct": 0.0,  "notes": "" },
+      { "type": "TIPS",         "targetWeightPct": 0.0,  "currentWeightPct": 0.0,  "notes": "" },
+      { "type": "CTA",          "targetWeightPct": 0.0,  "currentWeightPct": 0.0,  "notes": "" },
+      { "type": "COMMODITIES",  "targetWeightPct": 0.0,  "currentWeightPct": 0.0,  "notes": "" },
+      { "type": "DIVERSIFIERS", "targetWeightPct": 15.0, "currentWeightPct": 15.0, "notes": "" },
+      { "type": "REAL_ASSETS",  "targetWeightPct": 0.0,  "currentWeightPct": 0.0,  "notes": "" },
+      { "type": "LIQUIDITY",    "targetWeightPct": 15.0, "currentWeightPct": 15.0, "notes": "" }
+    ],
+    "privateExposure": {
+      "pePct": 10.0,
+      "privateCreditPct": 5.0,
+      "coreInfraPct": 5.0,
+      "navLagQuarters": 2,
+      "smoothing": true
+    },
+    "governanceConstraint": {
+      "maxDdPct": 30,
+      "horizonMonths": 24,
+      "notes": "Target max drawdown 30% over 24 months"
+    },
+    "liquidityNeeds": {
+      "next12mCallsM": 8,
+      "operatingCashPerYearM": 3,
+      "reserveMultiple": 1.5,
+      "reserveM": null
+    },
+    "rebalancingPolicy": {
+      "bandPp": 5,
+      "frequency": "QUARTERLY",
+      "notes": "±5pp bands; quarterly review"
+    },
+    "fxOverlay": {
+      "dmBondsHedgePct": 90,
+      "equitiesHedgePct": 50,
+      "otherHedgePct": 0,
+      "chfLiquidityBufferMonths": 6
+    }
+  }
+}

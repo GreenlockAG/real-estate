@@ -1,0 +1,1062 @@
+
+# Airtable Data Import Guide: Authentication & Optimal Protocols
+
+This guide provides a comprehensive overview of implementing successful Airtable data imports in Replit applications, covering authentication, credential management, and best practices for reliable data ingestion.
+
+## Table of Contents
+1. [Prerequisites](#prerequisites)
+2. [Authentication Setup](#authentication-setup)
+3. [Credential Management in Replit](#credential-management-in-replit)
+4. [API Configuration](#api-configuration)
+5. [Rate Limiting & Connection Management](#rate-limiting--connection-management)
+6. [Data Import Protocols](#data-import-protocols)
+7. [Error Handling & Retry Logic](#error-handling--retry-logic)
+8. [Incremental Sync Strategies](#incremental-sync-strategies)
+9. [Performance Optimization](#performance-optimization)
+10. [Monitoring & Logging](#monitoring--logging)
+11. [Troubleshooting Common Issues](#troubleshooting-common-issues)
+
+## Prerequisites
+
+Before starting your Airtable integration, ensure you have:
+
+- **Airtable Account**: With access to the base you want to import from
+- **Personal Access Token**: Generated from your Airtable account settings
+- **Base ID**: The unique identifier of your Airtable base
+- **Table IDs**: The specific table identifiers you want to access
+- **Replit Environment**: With Python 3.8+ or Node.js 16+
+
+## Authentication Setup
+
+### 1. Generate Airtable Personal Access Token
+
+1. Navigate to [Airtable Account Settings](https://airtable.com/account)
+2. Go to the "Personal access tokens" section
+3. Click "Create new token"
+4. Configure token permissions:
+   ```
+   Scopes: data.records:read, schema:read
+   Access: [Select your specific bases]
+   ```
+5. Copy and securely store the generated token
+
+### 2. Find Your Base ID
+
+The Base ID is found in your Airtable URL or API documentation:
+```
+https://airtable.com/app[BASE_ID]/tbl[TABLE_ID]/...
+```
+
+Example: `appXYZ123ABC` (always starts with "app")
+
+### 3. Identify Table IDs
+
+Table IDs can be found in:
+- Airtable API documentation for your base
+- URL when viewing a specific table
+- Airtable's API explorer
+
+Example: `tblABC123XYZ` (always starts with "tbl")
+
+## Credential Management in Replit
+
+### Using Replit Secrets
+
+1. **Access Secrets Tool**:
+   - Navigate to Tools → Secrets in your Repl
+   - Or click the "+" button and search for "Secrets"
+
+2. **Add Required Secrets**:
+   ```
+   Secret Key: AIRTABLE_TOKEN
+   Secret Value: [Your Personal Access Token]
+   
+   Secret Key: AIRTABLE_BASE_ID
+   Secret Value: [Your Base ID]
+   
+   Secret Key: AIRTABLE_TABLE_FUNDS
+   Secret Value: [Your Funds Table ID]
+   
+   Secret Key: AIRTABLE_TABLE_GROUPS
+   Secret Value: [Your Groups Table ID]
+   ```
+
+3. **Access Secrets in Code**:
+
+   **Python Example**:
+   ```python
+   import os
+   
+   AIRTABLE_TOKEN = os.getenv('AIRTABLE_TOKEN')
+   AIRTABLE_BASE_ID = os.getenv('AIRTABLE_BASE_ID')
+   AIRTABLE_TABLE_FUNDS = os.getenv('AIRTABLE_TABLE_FUNDS')
+   
+   if not AIRTABLE_TOKEN:
+       raise ValueError("AIRTABLE_TOKEN not found in environment variables")
+   ```
+
+   **JavaScript Example**:
+   ```javascript
+   const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+   const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+   
+   if (!AIRTABLE_TOKEN) {
+       throw new Error('AIRTABLE_TOKEN not found in environment variables');
+   }
+   ```
+
+### Environment Variable Validation
+
+Create a validation function to ensure all required credentials are present:
+
+```python
+def validate_airtable_config():
+    """Validate all required Airtable configuration is present"""
+    required_vars = [
+        'AIRTABLE_TOKEN',
+        'AIRTABLE_BASE_ID',
+        'AIRTABLE_TABLE_FUNDS',
+        'AIRTABLE_TABLE_GROUPS'
+    ]
+    
+    missing = [var for var in required_vars if not os.getenv(var)]
+    
+    if missing:
+        raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
+    
+    return {var: os.getenv(var) for var in required_vars}
+```
+
+## API Configuration
+
+### Basic HTTP Client Setup
+
+**Python with HTTPX**:
+```python
+import httpx
+import asyncio
+from typing import Dict, Any, Optional
+
+class AirtableClient:
+    def __init__(self, token: str, base_id: str, rate_limit_rps: float = 4.0):
+        self.token = token
+        self.base_id = base_id
+        self.rate_limit_rps = rate_limit_rps
+        self.rate_limit_delay = 1.0 / rate_limit_rps
+        
+        self.client = httpx.AsyncClient(
+            base_url="https://api.airtable.com/v0",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
+            timeout=30.0
+        )
+        
+    async def __aenter__(self):
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.client.aclose()
+```
+
+**JavaScript with Axios**:
+```javascript
+const axios = require('axios');
+
+class AirtableClient {
+    constructor(token, baseId, rateLimitRps = 4.0) {
+        this.token = token;
+        this.baseId = baseId;
+        this.rateLimitDelay = 1000 / rateLimitRps;
+        
+        this.client = axios.create({
+            baseURL: 'https://api.airtable.com/v0',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 30000
+        });
+        
+        this.lastRequestTime = 0;
+    }
+}
+```
+
+## Rate Limiting & Connection Management
+
+### Implement Proper Rate Limiting
+
+Airtable has strict rate limits (5 requests per second per base):
+
+```python
+import asyncio
+import time
+
+class RateLimiter:
+    def __init__(self, rate_limit_rps: float):
+        self.rate_limit_rps = rate_limit_rps
+        self.rate_limit_delay = 1.0 / rate_limit_rps
+        self.last_request_time = 0.0
+    
+    async def wait_if_needed(self):
+        """Ensure we don't exceed rate limits"""
+        now = time.time()
+        elapsed = now - self.last_request_time
+        
+        if elapsed < self.rate_limit_delay:
+            sleep_time = self.rate_limit_delay - elapsed
+            await asyncio.sleep(sleep_time)
+        
+        self.last_request_time = time.time()
+```
+
+### Connection Pool Management
+
+```python
+async def create_airtable_session():
+    """Create a reusable HTTP session with connection pooling"""
+    limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
+    timeout = httpx.Timeout(10.0, read=30.0)
+    
+    return httpx.AsyncClient(
+        limits=limits,
+        timeout=timeout,
+        headers={"Authorization": f"Bearer {AIRTABLE_TOKEN}"}
+    )
+```
+
+## Data Import Protocols
+
+### 1. Schema Discovery Protocol
+
+```python
+async def discover_table_schema(client: AirtableClient, table_id: str):
+    """Discover table schema by fetching a small sample"""
+    
+    url = f"/{client.base_id}/{table_id}"
+    params = {
+        'maxRecords': 10,
+        'pageSize': 10
+    }
+    
+    try:
+        response = await client._make_request(url, params)
+        records = response.get('records', [])
+        
+        if not records:
+            return None
+        
+        # Analyze field types from samples
+        field_types = {}
+        for record in records:
+            fields = record.get('fields', {})
+            for field_name, value in fields.items():
+                if field_name not in field_types:
+                    field_types[field_name] = type(value).__name__
+        
+        return {
+            'table_id': table_id,
+            'record_count_sample': len(records),
+            'fields': field_types,
+            'sample_record': records[0] if records else None
+        }
+        
+    except Exception as e:
+        logger.error(f"Schema discovery failed for {table_id}: {e}")
+        return None
+```
+
+### 2. Full Data Import Protocol
+
+```python
+async def import_table_data(client: AirtableClient, table_id: str, 
+                          fields: Optional[List[str]] = None,
+                          batch_size: int = 100) -> List[Dict[str, Any]]:
+    """Import all data from a table with pagination"""
+    
+    url = f"/{client.base_id}/{table_id}"
+    params = {
+        'pageSize': min(batch_size, 100)  # Airtable max is 100
+    }
+    
+    # Add field filtering if specified
+    if fields:
+        for i, field in enumerate(fields):
+            params[f'fields[{i}]'] = field
+    
+    all_records = []
+    offset = None
+    page = 0
+    
+    while True:
+        page += 1
+        current_params = params.copy()
+        
+        if offset:
+            current_params['offset'] = offset
+        
+        logger.debug(f"Fetching page {page} from {table_id}")
+        
+        try:
+            response = await client._make_request(url, current_params)
+            records = response.get('records', [])
+            
+            if not records:
+                break
+            
+            # Process and normalize records
+            for record in records:
+                normalized = normalize_airtable_record(record)
+                all_records.append(normalized)
+            
+            logger.debug(f"Page {page}: {len(records)} records")
+            
+            # Check for next page
+            offset = response.get('offset')
+            if not offset:
+                break
+                
+        except Exception as e:
+            logger.error(f"Failed to fetch page {page}: {e}")
+            raise
+    
+    logger.info(f"Imported {len(all_records)} records from {table_id}")
+    return all_records
+```
+
+### 3. Record Normalization Protocol
+
+```python
+def normalize_airtable_record(record: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize Airtable record structure"""
+    
+    normalized = {
+        'id': record.get('id'),
+        'created_time': record.get('createdTime'),
+        '_airtable_id': record.get('id'),  # Preserve original ID
+        '_raw': record  # Keep raw for debugging
+    }
+    
+    # Flatten fields with type-aware processing
+    fields = record.get('fields', {})
+    for field_name, field_value in fields.items():
+        # Handle linked records (arrays of record IDs)
+        if isinstance(field_value, list) and field_value:
+            if all(isinstance(item, str) for item in field_value):
+                normalized[field_name] = field_value
+                normalized[f"{field_name}_count"] = len(field_value)
+            else:
+                normalized[field_name] = field_value
+        
+        # Handle attachments
+        elif isinstance(field_value, list) and field_value and 'url' in str(field_value[0]):
+            normalized[field_name] = [item.get('url') for item in field_value]
+            normalized[f"{field_name}_count"] = len(field_value)
+        
+        # Handle single values
+        else:
+            normalized[field_name] = field_value
+    
+    return normalized
+```
+
+## Error Handling & Retry Logic
+
+### Robust Retry Implementation
+
+```python
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=4, max=60),
+    retry=retry_if_exception_type((httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException))
+)
+async def make_airtable_request(client, url: str, params: Optional[Dict] = None):
+    """Make API request with retry logic"""
+    
+    await client.rate_limiter.wait_if_needed()
+    
+    try:
+        response = await client.client.get(url, params=params)
+        
+        # Handle rate limiting
+        if response.status_code == 429:
+            retry_after = int(response.headers.get('Retry-After', 30))
+            logger.warning(f"Rate limited, waiting {retry_after}s")
+            await asyncio.sleep(retry_after)
+            raise httpx.HTTPStatusError("Rate limited", request=response.request, response=response)
+        
+        response.raise_for_status()
+        return response.json()
+        
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 404:
+            raise ValueError(f"Table not found: {url}")
+        elif e.response.status_code == 403:
+            raise ValueError(f"Access denied - check token permissions: {url}")
+        else:
+            logger.error(f"HTTP error {e.response.status_code}: {e}")
+            raise
+```
+
+### Error Classification
+
+```python
+class AirtableError(Exception):
+    """Base exception for Airtable operations"""
+    pass
+
+class AuthenticationError(AirtableError):
+    """Authentication or authorization failed"""
+    pass
+
+class RateLimitError(AirtableError):
+    """Rate limit exceeded"""
+    pass
+
+class DataValidationError(AirtableError):
+    """Data validation failed"""
+    pass
+
+def classify_airtable_error(response):
+    """Classify Airtable API errors for appropriate handling"""
+    status_code = response.status_code
+    
+    if status_code == 401:
+        raise AuthenticationError("Invalid or expired token")
+    elif status_code == 403:
+        raise AuthenticationError("Insufficient permissions")
+    elif status_code == 404:
+        raise ValueError("Base or table not found")
+    elif status_code == 429:
+        raise RateLimitError("Rate limit exceeded")
+    elif status_code == 422:
+        raise DataValidationError("Request validation failed")
+    else:
+        raise AirtableError(f"Unexpected error: {status_code}")
+```
+
+## Incremental Sync Strategies
+
+### Bookmark-Based Incremental Sync
+
+```python
+import json
+from pathlib import Path
+from datetime import datetime, timezone
+
+class BookmarkManager:
+    def __init__(self, bookmark_file: str = "state/bookmark.json"):
+        self.bookmark_file = Path(bookmark_file)
+        self.bookmark_file.parent.mkdir(exist_ok=True)
+        self._bookmarks = self._load_bookmarks()
+    
+    def _load_bookmarks(self) -> Dict[str, Dict[str, str]]:
+        """Load bookmarks from file"""
+        if self.bookmark_file.exists():
+            try:
+                with open(self.bookmark_file, 'r') as f:
+                    return json.load(f)
+            except Exception as e:
+                logger.warning(f"Failed to load bookmarks: {e}")
+        return {}
+    
+    def get_bookmark(self, source: str, table: str) -> Optional[datetime]:
+        """Get last sync timestamp for a table"""
+        bookmark_str = self._bookmarks.get(source, {}).get(table)
+        if bookmark_str:
+            try:
+                return datetime.fromisoformat(bookmark_str.replace('Z', '+00:00'))
+            except ValueError:
+                logger.warning(f"Invalid bookmark format: {bookmark_str}")
+        return None
+    
+    def set_bookmark(self, source: str, table: str, timestamp: datetime):
+        """Set bookmark for successful sync"""
+        if source not in self._bookmarks:
+            self._bookmarks[source] = {}
+        
+        self._bookmarks[source][table] = timestamp.isoformat()
+        
+        # Save to file
+        with open(self.bookmark_file, 'w') as f:
+            json.dump(self._bookmarks, f, indent=2)
+```
+
+### Incremental Fetch with Date Filtering
+
+```python
+async def fetch_incremental_data(client: AirtableClient, table_id: str, 
+                                since: Optional[datetime] = None) -> List[Dict]:
+    """Fetch data incrementally using last modified filtering"""
+    
+    url = f"/{client.base_id}/{table_id}"
+    params = {'pageSize': 100}
+    
+    # Add date filtering if provided
+    if since:
+        # Convert to Airtable-compatible format
+        timestamp_str = since.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+        filter_formula = f"IS_AFTER(LAST_MODIFIED_TIME(), '{timestamp_str}')"
+        params['filterByFormula'] = filter_formula
+        logger.info(f"Using incremental sync since: {timestamp_str}")
+    
+    try:
+        return await import_table_data(client, table_id, params=params)
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 422:
+            logger.warning("Filter formula failed, falling back to full sync")
+            return await import_table_data(client, table_id)
+        raise
+```
+
+## Performance Optimization
+
+### Batch Processing Protocol
+
+```python
+async def process_records_in_batches(records: List[Dict], batch_size: int = 100,
+                                   processor_func=None):
+    """Process large datasets in manageable batches"""
+    
+    total_records = len(records)
+    processed = 0
+    
+    for i in range(0, total_records, batch_size):
+        batch = records[i:i + batch_size]
+        
+        try:
+            if processor_func:
+                await processor_func(batch)
+            
+            processed += len(batch)
+            progress = (processed / total_records) * 100
+            logger.info(f"Processed {processed}/{total_records} records ({progress:.1f}%)")
+            
+            # Small delay between batches to avoid overwhelming target systems
+            if i + batch_size < total_records:
+                await asyncio.sleep(0.1)
+                
+        except Exception as e:
+            logger.error(f"Batch processing failed at batch {i//batch_size + 1}: {e}")
+            raise
+```
+
+### Memory Management for Large Datasets
+
+```python
+async def stream_large_table(client: AirtableClient, table_id: str,
+                           chunk_processor=None) -> int:
+    """Stream large tables without loading everything into memory"""
+    
+    url = f"/{client.base_id}/{table_id}"
+    params = {'pageSize': 100}
+    
+    total_processed = 0
+    offset = None
+    
+    while True:
+        current_params = params.copy()
+        if offset:
+            current_params['offset'] = offset
+        
+        response = await client._make_request(url, current_params)
+        records = response.get('records', [])
+        
+        if not records:
+            break
+        
+        # Process chunk immediately instead of accumulating
+        if chunk_processor:
+            await chunk_processor(records)
+        
+        total_processed += len(records)
+        logger.debug(f"Streamed {len(records)} records, total: {total_processed}")
+        
+        offset = response.get('offset')
+        if not offset:
+            break
+    
+    return total_processed
+```
+
+## Monitoring & Logging
+
+### Comprehensive Logging Setup
+
+```python
+from loguru import logger
+import sys
+
+def setup_logging(log_level: str = "INFO", log_file: str = "logs/airtable_import.log"):
+    """Configure comprehensive logging for Airtable import"""
+    
+    # Remove default handler
+    logger.remove()
+    
+    # Console logging with colors
+    logger.add(
+        sys.stderr,
+        level=log_level,
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
+        colorize=True
+    )
+    
+    # File logging with rotation
+    logger.add(
+        log_file,
+        level="DEBUG",
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
+        rotation="10 MB",
+        retention="30 days",
+        compression="gz"
+    )
+    
+    logger.info("Logging configured for Airtable import")
+```
+
+### Import Metrics Tracking
+
+```python
+class ImportMetrics:
+    def __init__(self):
+        self.start_time = datetime.now(timezone.utc)
+        self.records_processed = 0
+        self.records_inserted = 0
+        self.records_updated = 0
+        self.records_skipped = 0
+        self.errors = []
+    
+    def add_error(self, error: str, record_id: str = None):
+        self.errors.append({
+            'error': error,
+            'record_id': record_id,
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        })
+    
+    def get_summary(self) -> Dict[str, Any]:
+        end_time = datetime.now(timezone.utc)
+        duration = (end_time - self.start_time).total_seconds()
+        
+        return {
+            'duration_seconds': duration,
+            'records_per_second': self.records_processed / duration if duration > 0 else 0,
+            'total_processed': self.records_processed,
+            'inserted': self.records_inserted,
+            'updated': self.records_updated,
+            'skipped': self.records_skipped,
+            'error_count': len(self.errors),
+            'success_rate': (self.records_processed - len(self.errors)) / self.records_processed if self.records_processed > 0 else 0
+        }
+```
+
+## Troubleshooting Common Issues
+
+### Authentication Problems
+
+**Issue**: `401 Unauthorized` errors
+
+**Solutions**:
+```python
+async def test_authentication(token: str, base_id: str):
+    """Test Airtable authentication and permissions"""
+    
+    async with httpx.AsyncClient() as client:
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        try:
+            # Test basic API access
+            response = await client.get(
+                f"https://api.airtable.com/v0/meta/bases/{base_id}",
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                logger.info("✅ Authentication successful")
+                base_info = response.json()
+                logger.info(f"Base name: {base_info.get('name', 'Unknown')}")
+                return True
+            else:
+                logger.error(f"❌ Authentication failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"❌ Authentication test failed: {e}")
+            return False
+```
+
+### Rate Limit Handling
+
+**Issue**: `429 Too Many Requests` errors
+
+**Solutions**:
+```python
+async def handle_rate_limits(response):
+    """Handle rate limit responses gracefully"""
+    
+    if response.status_code == 429:
+        retry_after = int(response.headers.get('Retry-After', 30))
+        logger.warning(f"Rate limited. Waiting {retry_after} seconds...")
+        
+        # Exponential backoff with jitter
+        jitter = random.uniform(0.1, 0.5)
+        total_wait = retry_after + jitter
+        
+        await asyncio.sleep(total_wait)
+        return True
+    
+    return False
+```
+
+### Data Validation Issues
+
+**Issue**: Invalid or missing data
+
+**Solutions**:
+```python
+def validate_required_fields(record: Dict[str, Any], required_fields: List[str]) -> bool:
+    """Validate that required fields are present and not empty"""
+    
+    fields = record.get('fields', {})
+    
+    for field in required_fields:
+        value = fields.get(field)
+        
+        if value is None or value == '':
+            logger.warning(f"Missing required field '{field}' in record {record.get('id')}")
+            return False
+        
+        if isinstance(value, str) and not value.strip():
+            logger.warning(f"Empty required field '{field}' in record {record.get('id')}")
+            return False
+    
+    return True
+
+def clean_field_value(value: Any) -> Optional[str]:
+    """Clean and normalize field values"""
+    
+    if value is None:
+        return None
+    
+    if isinstance(value, str):
+        cleaned = value.strip()
+        # Handle common "no data" indicators
+        if cleaned.lower() in ['no data', 'n/a', 'xxx', '', 'null']:
+            return None
+        return cleaned
+    
+    return str(value) if value else None
+```
+
+## Complete Implementation Example
+
+### Full Airtable Import Class
+
+```python
+import asyncio
+import os
+from datetime import datetime, timezone
+from typing import List, Dict, Any, Optional
+
+class AirtableImporter:
+    def __init__(self):
+        self.config = self._load_config()
+        self.metrics = ImportMetrics()
+        self.bookmark_manager = BookmarkManager()
+    
+    def _load_config(self) -> Dict[str, str]:
+        """Load and validate Airtable configuration"""
+        config = {
+            'token': os.getenv('AIRTABLE_TOKEN'),
+            'base_id': os.getenv('AIRTABLE_BASE_ID'),
+            'table_funds': os.getenv('AIRTABLE_TABLE_FUNDS'),
+            'table_groups': os.getenv('AIRTABLE_TABLE_GROUPS'),
+        }
+        
+        missing = [k for k, v in config.items() if not v]
+        if missing:
+            raise ValueError(f"Missing configuration: {', '.join(missing)}")
+        
+        return config
+    
+    async def run_full_import(self) -> Dict[str, Any]:
+        """Execute complete Airtable import process"""
+        
+        logger.info("Starting Airtable import process")
+        
+        async with AirtableClient(
+            self.config['token'], 
+            self.config['base_id'],
+            rate_limit_rps=4.0
+        ) as client:
+            
+            try:
+                # Test authentication first
+                auth_valid = await self.test_connection(client)
+                if not auth_valid:
+                    raise AuthenticationError("Failed to authenticate with Airtable")
+                
+                # Import each configured table
+                tables_to_import = [
+                    ('funds', self.config['table_funds']),
+                    ('groups', self.config['table_groups'])
+                ]
+                
+                results = {}
+                
+                for table_name, table_id in tables_to_import:
+                    logger.info(f"Importing {table_name} from {table_id}")
+                    
+                    # Get incremental sync point
+                    since = self.bookmark_manager.get_bookmark('airtable', table_id)
+                    
+                    # Import data
+                    records = await fetch_incremental_data(client, table_id, since)
+                    
+                    # Process records
+                    processed_count = await self.process_table_records(records, table_name)
+                    
+                    # Update bookmark on success
+                    self.bookmark_manager.set_bookmark(
+                        'airtable', 
+                        table_id, 
+                        datetime.now(timezone.utc)
+                    )
+                    
+                    results[table_name] = {
+                        'records_imported': len(records),
+                        'records_processed': processed_count,
+                        'table_id': table_id
+                    }
+                
+                logger.info("Airtable import completed successfully")
+                return {
+                    'success': True,
+                    'metrics': self.metrics.get_summary(),
+                    'tables': results
+                }
+                
+            except Exception as e:
+                logger.error(f"Import failed: {e}")
+                return {
+                    'success': False,
+                    'error': str(e),
+                    'metrics': self.metrics.get_summary()
+                }
+    
+    async def test_connection(self, client: AirtableClient) -> bool:
+        """Test Airtable connection and permissions"""
+        
+        try:
+            # Test access to base metadata
+            url = f"/meta/bases/{client.base_id}"
+            response = await client._make_request(url)
+            
+            logger.info(f"✅ Connected to base: {response.get('name', 'Unknown')}")
+            
+            # Test table access
+            for table_name, table_id in [('funds', self.config['table_funds']), ('groups', self.config['table_groups'])]:
+                test_url = f"/{client.base_id}/{table_id}"
+                test_params = {'maxRecords': 1}
+                
+                test_response = await client._make_request(test_url, test_params)
+                record_count = len(test_response.get('records', []))
+                logger.info(f"✅ Access to {table_name} table confirmed ({record_count} sample records)")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Connection test failed: {e}")
+            return False
+    
+    async def process_table_records(self, records: List[Dict], table_name: str) -> int:
+        """Process imported records for a specific table"""
+        
+        processed = 0
+        
+        for record in records:
+            try:
+                # Validate record
+                if not self.validate_record(record, table_name):
+                    self.metrics.records_skipped += 1
+                    continue
+                
+                # Normalize record
+                normalized = normalize_airtable_record(record)
+                
+                # Process based on table type
+                if table_name == 'funds':
+                    await self.process_fund_record(normalized)
+                elif table_name == 'groups':
+                    await self.process_group_record(normalized)
+                
+                processed += 1
+                self.metrics.records_processed += 1
+                
+            except Exception as e:
+                error_msg = f"Failed to process record {record.get('id')}: {e}"
+                logger.error(error_msg)
+                self.metrics.add_error(error_msg, record.get('id'))
+        
+        return processed
+    
+    def validate_record(self, record: Dict[str, Any], table_name: str) -> bool:
+        """Validate record based on table requirements"""
+        
+        # Define required fields per table
+        required_fields = {
+            'funds': ['Security name', 'ISIN'],
+            'groups': ['Client strategy', 'Fund type']
+        }
+        
+        table_required = required_fields.get(table_name, [])
+        return validate_required_fields(record, table_required)
+```
+
+## Integration with Replit Applications
+
+### Express.js API Endpoint
+
+```javascript
+// server.js
+app.post('/api/import-airtable', async (req, res) => {
+    try {
+        console.log('Starting Airtable import...');
+        
+        // Validate environment
+        const requiredVars = ['AIRTABLE_TOKEN', 'AIRTABLE_BASE_ID'];
+        const missing = requiredVars.filter(v => !process.env[v]);
+        
+        if (missing.length > 0) {
+            return res.status(400).json({
+                success: false,
+                error: `Missing environment variables: ${missing.join(', ')}`
+            });
+        }
+        
+        // Execute Python import script
+        const { spawn } = require('child_process');
+        const importProcess = spawn('python', ['scripts/airtable_import.py'], {
+            env: process.env,
+            stdio: ['inherit', 'pipe', 'pipe']
+        });
+        
+        let output = '';
+        let errorOutput = '';
+        
+        importProcess.stdout.on('data', (data) => {
+            output += data.toString();
+            console.log(`Import: ${data.toString().trim()}`);
+        });
+        
+        importProcess.stderr.on('data', (data) => {
+            errorOutput += data.toString();
+            console.error(`Import Error: ${data.toString().trim()}`);
+        });
+        
+        importProcess.on('close', (code) => {
+            if (code === 0) {
+                res.json({
+                    success: true,
+                    message: 'Airtable import completed successfully',
+                    output: output.split('\n').slice(-10) // Last 10 lines
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    error: 'Import process failed',
+                    output: errorOutput
+                });
+            }
+        });
+        
+    } catch (error) {
+        console.error('Airtable import failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+```
+
+### Configuration Management
+
+Create a configuration class that works with Replit's environment:
+
+```python
+class AirtableConfig:
+    def __init__(self):
+        self.token = self._get_required_env('AIRTABLE_TOKEN')
+        self.base_id = self._get_required_env('AIRTABLE_BASE_ID')
+        self.table_funds = self._get_required_env('AIRTABLE_TABLE_FUNDS')
+        self.table_groups = os.getenv('AIRTABLE_TABLE_GROUPS')  # Optional
+        
+        # Performance settings
+        self.rate_limit_rps = float(os.getenv('AIRTABLE_RATE_LIMIT', '4.0'))
+        self.batch_size = int(os.getenv('AIRTABLE_BATCH_SIZE', '100'))
+        self.timeout = int(os.getenv('AIRTABLE_TIMEOUT', '30'))
+        
+        # Feature flags
+        self.use_incremental_sync = os.getenv('USE_INCREMENTAL_SYNC', 'true').lower() == 'true'
+        self.enable_validation = os.getenv('ENABLE_VALIDATION', 'true').lower() == 'true'
+    
+    def _get_required_env(self, var_name: str) -> str:
+        value = os.getenv(var_name)
+        if not value:
+            raise ValueError(f"Required environment variable {var_name} not set")
+        return value
+    
+    def validate(self) -> bool:
+        """Validate configuration completeness"""
+        try:
+            required_attrs = ['token', 'base_id', 'table_funds']
+            for attr in required_attrs:
+                if not getattr(self, attr):
+                    logger.error(f"Missing required configuration: {attr}")
+                    return False
+            
+            logger.info("✅ Configuration validation passed")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Configuration validation failed: {e}")
+            return False
+```
+
+## Best Practices Summary
+
+### Security
+- ✅ Always store API tokens in Replit Secrets, never in code
+- ✅ Use environment variable validation on startup
+- ✅ Implement token expiration checks
+- ✅ Log authentication events for security auditing
+
+### Performance
+- ✅ Implement proper rate limiting (4-5 RPS max)
+- ✅ Use batch processing for large datasets
+- ✅ Implement connection pooling and reuse
+- ✅ Stream large datasets instead of loading into memory
+
+### Reliability
+- ✅ Use exponential backoff for retry logic
+- ✅ Implement comprehensive error classification
+- ✅ Use incremental sync with bookmarks
+- ✅ Validate data integrity at each step
+
+### Monitoring
+- ✅ Implement structured logging with log levels
+- ✅ Track import metrics and performance
+- ✅ Set up health checks and connection testing
+- ✅ Monitor for data drift and synchronization issues
+
+### Development Workflow
+- ✅ Test with small datasets first
+- ✅ Use dry-run mode for development
+- ✅ Implement schema discovery for new tables
+- ✅ Version control your field mappings and configurations
+
+This guide provides a production-ready foundation for implementing Airtable data imports in any Replit application. Adapt the specific code examples to your target programming language and application architecture while following these core protocols and best practices.

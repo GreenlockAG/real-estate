@@ -1,0 +1,769 @@
+NPUTS FOR THE TOP 5 RISK METRICS
+HIGH-LEVEL INPUT MAP
+┌─────────────────────────────────────────────────────────────┐
+│                    INPUT CATEGORIES                          │
+├─────────────────────────────────────────────────────────────┤
+│ 1. PORTFOLIO COMPOSITION (what you own)                     │
+│ 2. MARKET PARAMETERS (how assets behave)                    │
+│ 3. CASH FLOW PROJECTIONS (liquidity needs)                  │
+│ 4. HISTORICAL DATA (for backtesting/correlations)           │
+│ 5. SCENARIO DEFINITIONS (crisis assumptions)                │
+└─────────────────────────────────────────────────────────────┘
+
+DETAILED INPUT REQUIREMENTS BY METRIC
+METRIC #1: MAX DRAWDOWN (DD)
+Primary Inputs:
+
+
+
+Input
+Format
+Source
+Frequency
+
+
+
+Portfolio NAV time series
+Daily or monthly USD values
+Custodian/Addepar/manual
+Real-time (daily preferred)
+
+
+Sleeve-level NAV (optional but recommended)
+Growth, Credit, Hedges, etc.
+Same
+Monthly minimum
+
+
+Private asset marks
+Quarterly NAV from GPs
+GP statements
+Quarterly (lag-adjusted)
+
+
+Calculation:
+DD(t) = (NAV(t) - Peak NAV up to t) / Peak NAV up to t
+Max DD = Minimum of all DD(t) over lookback period
+Critical Details:
+
+Lookback period: 36 months minimum (captures full cycle)
+Private asset handling: 
+Use reported marks for current DD (what principal sees)
+Use de-smoothed marks for forward-looking risk (multiply vol by 1.5-2.0x)
+
+
+FX adjustment: Convert all non-USD holdings to USD at daily/monthly rates
+
+
+METRIC #2: LIQUIDITY COVERAGE RATIO (LCR)
+Primary Inputs:
+NUMERATOR (Available Liquidity):
+
+
+
+Input
+Amount
+Source
+Notes
+
+
+
+Cash & T-bills
+$ __M
+Custodian
+Immediate liquidity
+
+
+Short IG bonds (<2yr)
+$ __M
+Custodian
+1-5 day liquidity
+
+
+Undrawn credit lines
+$ __M
+Bank LOC agreement
+Mark down by 20% (may not be available in crisis)
+
+
+Money market funds
+$ __M
+Custodian
+Same-day liquidity
+
+
+TOTAL NUMERATOR
+$ __M
+
+
+
+
+DENOMINATOR (Next 12-Month Cash Needs):
+
+
+
+Input
+Amount
+Source
+Notes
+
+
+
+Capital calls (unfunded)
+$ __M
+PE/credit GP capital call schedules
+Take 100% of unfunded commitments × 70% (assume 70% drawn over 12mo)
+
+
+Distributions to principals
+$ __M
+Family spending plan
+Include taxes if paid from portfolio
+
+
+Operating expenses
+$ __M
+Budget
+Advisory fees, admin, audit
+
+
+Minus: Expected distributions
+- $ __M
+PE/credit waterfall projections
+Conservative estimate (assume 50% of GP projections)
+
+
+TOTAL DENOMINATOR
+$ __M
+
+
+
+
+Calculation:
+LCR = Total Numerator / Total Denominator
+
+Target: ≥1.50x (conservative); ≥1.25x (moderate)
+Example for $50M FO:
+NUMERATOR:
+  Cash/T-bills:        $5M
+  Short IG:            $3M
+  Credit line (adj.):  $2M ($2.5M × 80%)
+  TOTAL:               $10M
+
+DENOMINATOR:
+  Capital calls:       $4M ($8M unfunded × 50% assumed drawn)
+  Distributions:       $2M
+  Expenses:            $0.3M
+  Less: PE distrib.:   -$1M
+  TOTAL:               $5.3M
+
+LCR = $10M / $5.3M = 1.89x ✅ HEALTHY
+
+METRIC #3: CRISIS P&L
+Primary Inputs:
+A. CURRENT PORTFOLIO WEIGHTS:
+
+
+
+Sleeve
+Weight
+Amount ( $ M)
+Source
+
+
+
+Global Equities
+__%
+$ __M
+Custodian
+
+
+PE (fair value)
+__%
+$ __M
+GP statements
+
+
+Credit
+__%
+$ __M
+Custodian + GP
+
+
+Duration (10y equiv.)
+__%
+$ __M
+Custodian
+
+
+TIPS
+__%
+$ __M
+Custodian
+
+
+CTA/Trend
+__%
+$ __M
+Custodian
+
+
+Commodities
+__%
+$ __M
+Custodian
+
+
+Diversifiers
+__%
+$ __M
+Custodian
+
+
+Real Assets
+__%
+$ __M
+GP statements
+
+
+Liquidity
+__%
+$ __M
+Custodian
+
+
+B. SCENARIO SHOCK ASSUMPTIONS:
+(I provide these; you can customize)
+2008 Scenario (Sep-Nov 2008):
+
+
+
+Asset
+Shock
+Notes
+
+
+
+S&P 500
+-40%
+Oct 2007 → Mar 2009 trough
+
+
+MSCI World ex-US
+-45%
+
+
+
+US 10y Treasury
++20%
+Yields: 3.7% → 2.1%
+
+
+US IG Credit
+-15%
+OAS widened +400bp
+
+
+US HY Credit
+-35%
+
+
+
+PE (1-quarter lag)
+-25%
+Marks lagged public by ~6 months
+
+
+Commodities
+-35%
+Oil  $ 147 → $35
+
+
+Gold
++5%
+Flight to quality
+
+
+2020 Scenario (Feb-Mar 2020):
+
+
+
+Asset
+Shock (trough)
+Recovery (12mo)
+
+
+
+S&P 500
+-30%
++70% (new highs)
+
+
+US 10y Treasury
++10%
+-5%
+
+
+Credit (IG)
+-12%
++15%
+
+
+CTA/Trend
++8%
++12% (crisis alpha)
+
+
+1970s Scenario (1973-1974):
+
+
+
+Asset
+Shock
+Notes
+
+
+
+S&P 500 (real)
+-45%
+Nominal -40%, inflation -5%
+
+
+Bonds (real)
+-35%
+Yields rose, inflation crushed real returns
+
+
+Commodities
++200%
+Oil shock
+
+
+TIPS (synthetic)
+-5%
+Short-duration real bonds held value
+
+
+Calculation Process:
+For each scenario:
+  For each sleeve:
+    Shock_Impact = Weight × Scenario_Shock
+  
+  Portfolio_Shock = Sum(all Shock_Impacts)
+Example: $50M Portfolio in 2008
+Equities (40% × -40%):        -16.0%
+PE (15% × -25%):               -3.8%
+Credit (10% × -15%):           -1.5%
+Duration (15% × +20%):         +3.0%
+TIPS (5% × 0%):                 0.0%
+CTA (5% × +12%):               +0.6%
+Commodities (5% × -35%):       -1.8%
+Real Assets (5% × -20%):       -1.0%
+──────────────────────────────────
+TOTAL CRISIS P&L:             -20.5%
+
+METRIC #4: EXPECTED SHORTFALL (ES97.5)
+Primary Inputs:
+A. ASSET CLASS RETURN ASSUMPTIONS:
+
+
+
+Asset
+Expected Return
+Volatility
+Source
+
+
+
+Global Equities
+7.5%
+18%
+Historical + current valuations
+
+
+PE
+10%
+25% (de-smoothed)
+Cambridge Associates + 1.5x adjustment
+
+
+Credit
+5.5%
+8%
+Current spreads + default assumptions
+
+
+US 10y Duration
+3.5%
+6%
+Yield + roll-down
+
+
+TIPS
+2.5%
+5%
+Real yield
+
+
+CTA
+4%
+12%
+Managed futures historical
+
+
+Commodities
+4%
+20%
+Bloomberg Commodity Index
+
+
+Diversifiers
+5%
+7%
+ILS/RV blend
+
+
+Real Assets
+6%
+12%
+Core infra + RE
+
+
+B. CORRELATION MATRIX:
+(This is the most critical input—I'll provide a template below)
+Simplified 5×5 Correlation Matrix (Normal Regime):
+
+
+
+
+Equities
+Credit
+Duration
+CTA
+Commodities
+
+
+
+Equities
+1.00
+0.65
+-0.25
+-0.05
+0.35
+
+
+Credit
+0.65
+1.00
+-0.15
+0.05
+0.25
+
+
+Duration
+-0.25
+-0.15
+1.00
+0.10
+-0.10
+
+
+CTA
+-0.05
+0.05
+0.10
+1.00
+0.40
+
+
+Commodities
+0.35
+0.25
+-0.10
+0.40
+1.00
+
+
+Stress Regime Correlation Matrix (2022-style):
+
+
+
+
+Equities
+Credit
+Duration
+CTA
+Commodities
+
+
+
+Equities
+1.00
+0.75
++0.55
+-0.15
+0.60
+
+
+Credit
+0.75
+1.00
++0.45
+0.00
+0.40
+
+
+Duration
++0.55
++0.45
+1.00
+-0.05
+0.25
+
+
+CTA
+-0.15
+0.00
+-0.05
+1.00
+0.50
+
+
+Commodities
+0.60
+0.40
+0.25
+0.50
+1.00
+
+
+C. MONTE CARLO SETTINGS:
+
+
+
+Parameter
+Value
+Notes
+
+
+
+Number of simulations
+10,000
+Minimum for stable ES97.5
+
+
+Time horizon
+12 months
+Match family review cycle
+
+
+Return distribution
+Normal or Student-t (df=5)
+Student-t for fat tails
+
+
+Regime-switching
+Yes (2 states: normal 75%, stress 25%)
+Critical for realism
+
+
+Rebalancing
+Quarterly
+Match governance cadence
+
+
+Calculation:
+1. Draw 10,000 random paths (12 monthly returns each)
+2. For each path, calculate terminal portfolio value
+3. Sort paths by terminal value (worst to best)
+4. ES97.5 = Average of worst 250 paths (2.5% × 10,000)
+Key Output:
+Portfolio NAV: $50M
+Expected Return (12mo): +5.5%
+ES97.5: -17.2%
+
+Interpretation: "In the worst 2.5% of outcomes over the next year, 
+                 we expect an average loss of 17.2%"
+
+METRIC #5: CORRELATION STRESS INDEX (CSI)
+Primary Inputs:
+A. TIME SERIES DATA (12 months minimum; 36 months preferred):
+
+
+
+Data
+Frequency
+Source
+Notes
+
+
+
+Growth sleeve returns
+Monthly
+Custodian
+Equities + PE + Credit
+
+
+Hedges sleeve returns
+Monthly
+Custodian
+Duration + TIPS + CTA + Commodities
+
+
+Date range
+Last 36 months
+
+Rolling calculation
+
+
+Example Data Table:
+
+
+
+Month
+Growth Return
+Hedges Return
+
+
+
+Jan 2024
++2.3%
++0.8%
+
+
+Feb 2024
+-1.5%
++1.2%
+
+
+Mar 2024
++3.1%
+-0.3%
+
+
+...
+...
+...
+
+
+Calculation:
+CSI = CORREL(Growth_Returns[last 12 months], Hedges_Returns[last 12 months])
+
+# Rolling calculation:
+For month_end in date_range:
+    CSI[month_end] = CORREL(Growth[-12:], Hedges[-12:])
+Alert Triggers:
+If CSI > -0.10 for 2 consecutive months:
+    → Review Hedges sleeve composition
+    
+If CSI > 0.00:
+    → Shift to CTA/TIPS away from duration
+    
+If CSI > +0.30 for 3 months:
+    → Emergency IC meeting
+
+MASTER INPUT CHECKLIST: WHAT YOU NEED TO PROVIDE
+ONE-TIME SETUP (2-4 hours):
+
+ Portfolio structure: Sleeve definitions + current weights
+ AUM: Total + breakdown by sleeve
+ Private exposure detail: PE/credit/infra unfunded commitments, expected call schedule
+ Spending plan: Annual distributions + expenses
+ Credit lines: Amount + terms
+ Historical returns: 36 months of monthly NAV (total + by sleeve if possible)
+
+QUARTERLY UPDATES (30-60 minutes):
+
+ Current NAV: Total + by sleeve
+ Updated capital call schedule: From GP notices
+ Expected distributions: From GP updates
+ Cash position: Current liquidity
+
+WHAT I PROVIDE (Risk Parameters):
+
+ Volatility assumptions (by asset class)
+ Correlation matrices (normal + stress regimes)
+ Crisis scenario shocks (2008/2020/1970s)
+ De-smoothing factors (for PE/credit)
+ Monte Carlo settings
+ CSI thresholds
+
+
+SAMPLE DATA REQUEST TEMPLATE
+# RISK ANALYSIS INPUT REQUEST
+**For:** [Family Office Name]  
+**AUM:** $___M  
+**Base Currency:** USD  
+**Date:** [Quarter End]
+
+---
+
+## 1. PORTFOLIO COMPOSITION
+
+| Sleeve | $ Amount | % Weight | Notes |
+|--------|----------|----------|-------|
+| Global Equities | | | (public only) |
+| Private Equity | | | Fair value per latest GP statements |
+| Credit (public) | | | |
+| Credit (private) | | | |
+| Duration | | | 10y DV01: $__ per bp |
+| TIPS | | | 0-5y maturity |
+| CTA/Trend | | | |
+| Commodities | | | |
+| Diversifiers | | | (ILS, RV, etc.) |
+| Real Assets | | | (infra, RE) |
+| Liquidity/Reserves | | | T-bills + cash |
+| **TOTAL** | $__M | 100% | |
+
+---
+
+## 2. CAPITAL CALLS & DISTRIBUTIONS (Next 12 Months)
+
+| PE/Credit Fund | Unfunded Commitment | Expected Calls | Expected Distributions |
+|----------------|---------------------|----------------|------------------------|
+| Fund A | | | |
+| Fund B | | | |
+| Fund C | | | |
+| **TOTAL** | $__M | $__M | $__M |
+
+---
+
+## 3. LIQUIDITY POSITION
+
+| Item | Amount | Notes |
+|------|--------|-------|
+| Cash | $__M | |
+| T-bills | $__M | <90 days |
+| Short IG | $__M | <2yr maturity |
+| Credit lines (undrawn) | $__M | Total facility: $__M |
+| **TOTAL LIQUIDITY** | $__M | |
+
+---
+
+## 4. CASH FLOW NEEDS
+
+| Item | Annual | Quarterly | Notes |
+|------|--------|-----------|-------|
+| Family distributions | | | After-tax needs |
+| Operating expenses | | | Fees, admin, audit |
+| Planned investments | | | New commitments |
+
+---
+
+## 5. HISTORICAL NAV (if available)
+
+Attach CSV or Excel with:
+- Monthly total NAV (last 36 months)
+- Monthly NAV by sleeve (if tracked)
+
+BOTTOM LINE: MINIMUM VIABLE INPUTS
+To run all 5 metrics, you absolutely need:
+
+Current portfolio weights (by sleeve; 10 minutes)
+AUM (1 number)
+Capital call schedule (from GP notices; 20 minutes to aggregate)
+Cash + liquidity (from custodian; 5 minutes)
+12 months of monthly NAV (for CSI; from custodian or Addepar)
+
+Everything else (volatilities, correlations, crisis shocks), I provide as risk parameters.
+Total time to gather inputs: 1-2 hours quarterly.

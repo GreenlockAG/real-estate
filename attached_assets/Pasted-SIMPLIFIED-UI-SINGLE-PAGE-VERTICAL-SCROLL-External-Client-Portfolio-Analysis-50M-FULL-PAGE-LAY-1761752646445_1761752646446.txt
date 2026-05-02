@@ -1,0 +1,559 @@
+SIMPLIFIED UI: SINGLE-PAGE VERTICAL SCROLL
+External Client Portfolio Analysis ($50M+)
+
+FULL PAGE LAYOUT (Reordered)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ╔═══════════════════════════════════════════════════════════════════════╗  │
+│  ║  HEADER (Fixed - Always Visible)                                      ║  │
+│  ╚═══════════════════════════════════════════════════════════════════════╝  │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  SECTION 1: PORTFOLIO SNAPSHOT                                        │  │
+│  │  (Intake & Classification)                                            │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  SECTION 2: SETTINGS & ASSUMPTIONS                                    │  │
+│  │  (Client Profile, SAA Targets, Model Parameters)                      │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  SECTION 3: RISK METRICS                                              │  │
+│  │  (Historical Performance)                                             │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  SECTION 4: STRESS TESTING                                            │  │
+│  │  (Forward Projections)                                                │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+FIXED HEADER (Always Visible on Scroll)
+┌────────────────────────────────────────────────────────────────────────────┐
+│  ClientRisk Pro                                                            │
+│                                                                             │
+│  Client: Miller Family Trust          AUM: $78.2M          Jun 18, 2024    │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │  Jump to: [Portfolio ↓] [Settings ↓] [Risk ↓] [Stress Test ↓]      │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  Status: ✓ 42 positions classified  |  ⚠ 2 alerts  |  Last refresh: 3d ago│
+│  [↻ Refresh Data]  [Import New Holdings]                                  │
+└────────────────────────────────────────────────────────────────────────────┘
+Interactive Elements:
+
+Click "Jump to" buttons → smooth scroll to section
+"Refresh Data" → re-fetches pricing, re-classifies positions
+"Import New Holdings" → opens file upload dialog
+
+
+SECTION 1: PORTFOLIO SNAPSHOT
+┌────────────────────────────────────────────────────────────────────────────┐
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│  📊  SECTION 1: PORTFOLIO SNAPSHOT                                         │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                             │
+│  ┌──────────────────────────────────────┐  ┌─────────────────────────┐   │
+│  │  ALLOCATION BY SLEEVE                │  │  DRIFT vs. TARGET       │   │
+│  │                                      │  │                         │   │
+│  │  [Stacked horizontal bar]            │  │  Sleeve      Drift      │   │
+│  │                                      │  │  ──────────────────     │   │
+│  │  ████████████ Growth 58% ($45.2M)   │  │  Growth      +3%  ⚠     │   │
+│  │  ████ Credit 18% ($14.0M)           │  │  Hedges      -3%  🔴    │   │
+│  │  ███ Hedges 12% ($9.4M)             │  │  Others      On target  │   │
+│  │  ██ Diversifiers 7% ($5.5M)         │  │                         │   │
+│  │  █ Real Assets 3% ($2.3M)           │  │  [Fix in Settings ↓]    │   │
+│  │  █ Liquidity 2% ($1.6M)             │  │                         │   │
+│  │                                      │  │                         │   │
+│  └──────────────────────────────────────┘  └─────────────────────────┘   │
+│                                                                             │
+│  ⚠ ALERT: Hedges sleeve 3% underweight (12% vs. 15% target)               │
+│  💡 Quick Fix: [Adjust in Settings ↓]                                      │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐│
+│  │  POSITION DETAIL  [Expand ▼]                                          ││
+│  │                                                                        ││
+│  │  (Collapsed by default)                                               ││
+│  └───────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+│  [When expanded:]                                                           │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐│
+│  │  Filter: [All Sleeves ▼]  Search: [____________]  Sort: [MV Desc ▼]  ││
+│  │                                                                        ││
+│  │  Ticker/ISIN      Name               MV        %Port  Sleeve   Action ││
+│  │  ────────────────────────────────────────────────────────────────────││
+│  │  SPY            SPDR S&P 500      $12.5M      16%    Growth     –     ││
+│  │  VXUS           Vanguard Intl     $8.2M       10%    Growth     –     ││
+│  │  IE00BZ163L38   Wisdomtree PE     $4.1M       5%     Growth     –     ││
+│  │  PIMIX          PIMCO Income      $6.8M       9%     Credit     –     ││
+│  │  TLT            iShares 20Y+      $5.0M       6%     Hedges     –     ││
+│  │  ...                                                                  ││
+│  │                                                                        ││
+│  │  [Show 42 positions]  [Collapse ▲]                                    ││
+│  └───────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+│  ⚠ 3 positions need classification:                                        │
+│  ┌───────────────────────────────────────────────────────────────────────┐│
+│  │  1. Harbor Capital Fund ($800K) → Suggested: Diversifiers             ││
+│  │     [✓ Accept] [Reclassify As: _________]  [Exclude]                 ││
+│  │                                                                        ││
+│  │  2. XYZ Private Debt ($650K) → Suggested: Credit                      ││
+│  │     [✓ Accept] [Reclassify As: _________]                            ││
+│  │                                                                        ││
+│  │  3. Bitcoin ETF ($400K) → Suggested: (none - manual input required)   ││
+│  │     [Classify As: Diversifiers ▼]  [Exclude from analysis]           ││
+│  └───────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+│  [Apply Classifications]  [Save & Continue to Settings →]                  │
+│                                                                             │
+└────────────────────────────────────────────────────────────────────────────┘
+Interactive Behaviors:
+
+"Expand ▼" button: Slides down position table (animated)
+"Fix in Settings ↓" button: Scrolls to Section 2, highlights SAA targets
+"Apply Classifications" button: Saves changes, updates allocation chart, re-enables risk calculations
+Dropdown "Reclassify As": Shows all sleeve options (Growth, Credit, Hedges-Crisis, Hedges-Inflation, Diversifiers, Real Assets, Liquidity, Exclude)
+"Save & Continue to Settings →" button: Scrolls to Section 2
+
+
+SECTION 2: SETTINGS & ASSUMPTIONS
+┌────────────────────────────────────────────────────────────────────────────┐
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│  ⚙️  SECTION 2: SETTINGS & ASSUMPTIONS                                     │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  CLIENT PROFILE                                                       │ │
+│  │                                                                       │ │
+│  │  Name:               Miller Family Trust                             │ │
+│  │  AUM:                $78.2M                                           │ │
+│  │  Base Currency:      USD                                             │ │
+│  │  Account Type:       Tax-exempt trust                                │ │
+│  │  Investment Horizon: 15+ years                                       │ │
+│  │                                                                       │ │
+│  │  Annual Liquidity Needs:                                             │ │
+│  │  • Distributions:    $500K/year                                      │ │
+│  │  • Est. PE Calls:    $1.2M/year (declining)                          │ │
+│  │  • Buffer:           $300K                                           │ │
+│  │  • TOTAL:            $2.0M/year                                      │ │
+│  │                                                                       │ │
+│  │  Risk Tolerance:                                                     │ │
+│  │  Max Acceptable Drawdown:  [____-18%___]                             │ │
+│  │  Recovery Tolerance:       [____18 months___]                        │ │
+│  │                                                                       │ │
+│  │  [Edit Profile]                                                      │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  STRATEGIC ASSET ALLOCATION (SAA) TARGETS                             │ │
+│  │                                                                       │ │
+│  │  Sleeve              Target   Tolerance   Current   Status           │ │
+│  │  ─────────────────────────────────────────────────────────────────   │ │
+│  │  Growth              55%      ±5%         58%        ⚠ -3% needed    │ │
+│  │  Credit              18%      ±3%         18%        ✓ On target     │ │
+│  │  Hedges (Total)      15%      ±2%         12%        🔴 +3% needed   │ │
+│  │    ├─ Crisis         10%      —           8%         🔴 +2%          │ │
+│  │    └─ Inflation      5%       —           4%         🔴 +1%          │ │
+│  │  Diversifiers        7%       ±2%         7%         ✓ On target     │ │
+│  │  Real Assets         3%       ±2%         3%         ✓ On target     │ │
+│  │  Liquidity           2%       ±3%         2%         ✓ On target     │ │
+│  │  ─────────────────────────────────────────────────────────────────   │ │
+│  │  TOTAL               100%                 100%                        │ │
+│  │                                                                       │ │
+│  │  [Edit Targets]                                                       │ │
+│  │                                                                       │ │
+│  │  Rebalancing Policy:                                                 │ │
+│  │  ○ Never (manual approval required)                                  │ │
+│  │  ● Trigger-based (rebalance when drift > tolerance)                  │ │
+│  │  ○ Calendar (quarterly: Jan/Apr/Jul/Oct)                             │ │
+│  │                                                                       │ │
+│  │  [Save SAA Settings]                                                 │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  FORWARD-LOOKING ASSUMPTIONS (for Monte Carlo)                        │ │
+│  │                                                                       │ │
+│  │  Calibration Method: [● Blend] [○ Historical] [○ Forward] [○ Custom] │ │
+│  │                                                                       │ │
+│  │  Sleeve              E[Return]  Vol    Sharpe   [Edit]               │ │
+│  │  ─────────────────────────────────────────────────────────────────   │ │
+│  │  Growth              8.5%       16%    0.40     [✎]                  │ │
+│  │  Credit              6.0%       8%     0.50     [✎]                  │ │
+│  │  Hedges (Crisis)     2.0%       12%    0.00     [✎]                  │ │
+│  │  Hedges (Inflation)  3.5%       10%    0.15     [✎]                  │ │
+│  │  Diversifiers        5.0%       6%     0.50     [✎]                  │ │
+│  │  Real Assets         6.5%       12%    0.38     [✎]                  │ │
+│  │                                                                       │ │
+│  │  Calibration Logic:                                                  │ │
+│  │  • Blend: 50% historical (36mo realized) + 50% long-term forward     │ │
+│  │  • Historical: Use only realized stats from client NAV               │ │
+│  │  • Forward: Use capital market assumptions (ignore history)          │ │
+│  │  • Custom: Manually set each parameter                               │ │
+│  │                                                                       │ │
+│  │  Correlation Matrix: [View/Edit Matrix →]                            │ │
+│  │                                                                       │ │
+│  │  Regime Assumption:                                                  │ │
+│  │  ○ Disinflationary (pre-2022: equity-bond corr ~ -0.3)               │ │
+│  │  ● Inflation-aware (post-2022: equity-bond corr ~ +0.2)              │ │
+│  │  ○ Custom correlation matrix                                         │ │
+│  │                                                                       │ │
+│  │  [Reset to Defaults]  [Save Assumptions]                             │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  DATA SOURCES                                                         │ │
+│  │                                                                       │ │
+│  │  Holdings Import:                                                    │ │
+│  │  Last file: "Miller_Q2_2024.csv" (Jun 15, 2024)                      │ │
+│  │  [Upload New File]  [Download Template]                              │ │
+│  │                                                                       │ │
+│  │  Pricing Source:                                                     │ │
+│  │  [● API Connected]  [○ Manual CSV Upload]                            │ │
+│  │  Status: Connected ✓  (last refresh: 18:00 EST Jun 18)               │ │
+│  │  [Refresh Pricing Now]                                               │ │
+│  │                                                                       │ │
+│  │  Historical NAV:                                                     │ │
+│  │  Data available: 36 months (Jan 2021 - Jun 2024)                     │ │
+│  │  Frequency: Monthly                                                  │ │
+│  │  [Upload NAV History CSV]                                            │ │
+│  │                                                                       │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  [Calculate Risk Metrics →]                                                │
+│                                                                             │
+└────────────────────────────────────────────────────────────────────────────┘
+Interactive Behaviors:
+
+"Edit Profile" button: Makes fields editable inline (save/cancel buttons appear)
+"Edit Targets" button: Makes SAA table editable (with real-time validation: must sum to 100%)
+"View/Edit Matrix →" button: Opens modal with full correlation matrix (heatmap, editable cells)
+Click [✎] on any sleeve assumption: Opens inline editor for that row
+"Upload New File" buttons: Opens file upload dialog
+"Calculate Risk Metrics →" button: Validates all inputs, scrolls to Section 3, runs calculations (shows loading spinner)
+
+
+SECTION 3: RISK METRICS
+┌────────────────────────────────────────────────────────────────────────────┐
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│  📉  SECTION 3: RISK METRICS (Historical 36 months)                        │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                             │
+│  [Only visible after "Calculate Risk Metrics" is clicked in Section 2]     │
+│                                                                             │
+│  ┌──────────────────────────────────┐  ┌────────────────────────────────┐ │
+│  │  KEY METRICS (36mo)              │  │  BENCHMARK COMPARISON          │ │
+│  │                                  │  │                                │ │
+│  │  Return (annualized):    8.2%   │  │            You    60/40  MSCI  │ │
+│  │  Volatility:            11.5%   │  │  Return:   8.2%   7.5%   9.1%  │ │
+│  │  Sharpe Ratio:          0.52    │  │  Vol:     11.5%  10.1%  15.2%  │ │
+│  │  Max Drawdown:          -22%    │  │  Max DD:   -22%   -18%   -25%  │ │
+│  │  Recovery Time:         21 mo   │  │  Sharpe:  0.52   0.51   0.48   │ │
+│  │                                  │  │                                │ │
+│  │  🔴 Worse DD than 60/40 (-18%)  │  │  [Change Benchmark ▼]          │ │
+│  │  ✓ Better Sharpe than MSCI      │  │                                │ │
+│  │  ⚠ Recovery exceeded tolerance  │  │                                │ │
+│  │     (21mo vs. 18mo target)      │  │                                │ │
+│  └──────────────────────────────────┘  └────────────────────────────────┘ │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  DRAWDOWN HISTORY                                                     │ │
+│  │                                                                       │ │
+│  │  [Line chart: Portfolio NAV over 36 months with shaded DD periods]   │ │
+│  │                                                                       │ │
+│  │  $85M ┼─────────────●─────────────────── Peak (Jan 2022)            │ │
+│  │       │              ╲                                               │ │
+│  │       │               ╲        [Hover shows date + amount]           │ │
+│  │  $75M ┼                ╲_____                                        │ │
+│  │       │                      ╲___                                    │ │
+│  │  $65M ┼──────────────────────────●────── Trough (Oct 2022, -22%)    │ │
+│  │       │                           ╱────                              │ │
+│  │  $78M ┼──────────────────────────────────● Current (recovered)      │ │
+│  │       Jan22  Apr22  Jul22  Oct22  Jan23  Apr23  Jul23  Oct23  Now   │ │
+│  │                                                                       │ │
+│  │  [Zoom controls: 2020 | 2022 | All]                                 │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  SLEEVE CONTRIBUTION TO LAST MAJOR DRAWDOWN (Jan → Oct 2022)         │ │
+│  │                                                                       │ │
+│  │  Sleeve          Weight   Sleeve DD   Contribution   % of Loss       │ │
+│  │  ───────────────────────────────────────────────────────────────     │ │
+│  │  Growth          60%      -30%        -18.0%         82% 🔴          │ │
+│  │  Credit          17%      -14%        -2.4%          11%             │ │
+│  │  Hedges (Crisis) 6%       +12%        +0.7%          -3% ✓           │ │
+│  │  Hedges (Infl)   3%       +8%         +0.2%          -1% ✓           │ │
+│  │  Diversifiers    8%       -6%         -0.5%          2%              │ │
+│  │  Real Assets     4%       -10%        -0.4%          2%              │ │
+│  │  Liquidity       2%       0%          0.0%           0%              │ │
+│  │  ─────────────────────────────────────────────────────────────────   │ │
+│  │  TOTAL                              -20.4%  (actual: -22%)           │ │
+│  │                                                                       │ │
+│  │  💡 DIAGNOSIS: Hedges offset only 4% of Growth loss                  │ │
+│  │     → Hedges were undersized (9% vs. 15% current target)             │ │
+│  │     → [Adjust Hedge Size in Settings ↑]                              │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  CORRELATION ANALYSIS  [Expand ▼]                                     │ │
+│  │                                                                       │ │
+│  │  (Collapsed by default - shows key insight only)                     │ │
+│  │                                                                       │ │
+│  │  Growth vs. Hedges (Crisis):  Current 12mo rolling = +0.18           │ │
+│  │  Status: 🔴 ELEVATED (equity-bond correlation positive since 2022)   │ │
+│  │                                                                       │ │
+│  │  Implication: Duration-based hedges may fail in inflation shocks     │ │
+│  │  💡 Consider: Increase inflation hedges, add CTA/commodities         │ │
+│  │                                                                       │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  [When Expanded: Shows full correlation heatmap + time-series chart]       │
+│                                                                             │
+│  [Proceed to Stress Testing →]                                             │
+│                                                                             │
+└────────────────────────────────────────────────────────────────────────────┘
+Interactive Behaviors:
+
+Drawdown chart hover: Tooltip shows "Mar 2022: $72.1M (-12% from peak)"
+"Adjust Hedge Size in Settings ↑" button: Scrolls back to Section 2, highlights SAA table
+"Expand ▼" on correlation: Slides down heatmap (Growth vs all others, color-coded)
+"Change Benchmark" dropdown: Allows selecting different comparison (70/30, All-Weather, etc.)
+"Proceed to Stress Testing →" button: Scrolls to Section 4
+
+
+SECTION 4: STRESS TESTING
+┌────────────────────────────────────────────────────────────────────────────┐
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│  🎲  SECTION 4: STRESS TESTING (Forward-Looking)                           │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                             │
+│  Projection Horizon: [● 12 months]  [○ 3 years]  [○ 5 years]              │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  MONTE CARLO PROJECTION (10,000 simulations)                          │ │
+│  │                                                                       │ │
+│  │  [Fan chart showing NAV distribution]                                │ │
+│  │                                                                       │ │
+│  │  $95M ┼───────────────────────────────── 95th %ile                   │ │
+│  │       │      ░░░░░░░░░░░░░░░                                         │ │
+│  │  $88M ┼────────────────────────────────── 75th %ile                  │ │
+│  │       │   ░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░                                        │ │
+│  │  $82M ┼──────────────────────────────────── Median (expected)        │ │
+│  │       │ ░▒▒▓▓▓▓████████▓▓▓▓▒▒░                                       │ │
+│  │  $78M ●─────────────────────────────────── Today                     │ │
+│  │       │ ░▒▒▓▓▓▓████████▓▓▓▓▒▒░                                       │ │
+│  │  $70M ┼────────────────────────────────── 25th %ile                  │ │
+│  │       │   ░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░                                        │ │
+│  │  $62M ┼───────────────────────────────── 5th %ile (95% ES)           │ │
+│  │       │      ░░░░░░░░░░░░░░░                                         │ │
+│  │       Now    3mo     6mo     9mo     12mo                            │ │
+│  │                                                                       │ │
+│  │  Expected Return (geom):  +5.2%  (arith: +6.1%)                      │ │
+│  │  Volatility:              12.0%                                      │ │
+│  │  95% Expected Shortfall:  -20%  (avg loss in worst 5% scenarios)     │ │
+│  │  Worst 1% scenario:       -32%                                       │ │
+│  │                                                                       │ │
+│  │  ⚠ WARNING: 95% ES (-20%) exceeds client tolerance (-18%)            │ │
+│  │     → Risk reduction needed                                          │ │
+│  │     → [Adjust SAA to Reduce Risk ↑]                                  │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  SCENARIO ANALYSIS                                                    │ │
+│  │                                                                       │ │
+│  │  Select Scenario: [2022 Inflation Shock ▼]                           │ │
+│  │                                                                       │ │
+│  │  Preset Scenarios:                                                   │ │
+│  │  • 2008 Financial Crisis                                             │ │
+│  │  • COVID-19 (March 2020)                                             │ │
+│  │  ● 2022 Inflation Shock        ← SELECTED                            │ │
+│  │  • Stagflation (1970s-style)                                         │ │
+│  │  • [+ Create Custom Scenario]                                        │ │
+│  │                                                                       │ │
+│  │  ─────────────────────────────────────────────────────────────────   │ │
+│  │  SCENARIO: 2022 Inflation Shock                                      │ │
+│  │                                                                       │ │
+│  │  Market Assumptions:                                                 │ │
+│  │  • Equities:      -18% (growth stocks -25%)                          │ │
+│  │  • IG Bonds:      -13% (duration pain)                               │ │
+│  │  • HY Bonds:      -11% (credit spreads widen)                        │ │
+│  │  • Commodities:   +16% (energy, metals)                              │ │
+│  │  • Gold:          -1% (real rates rise)                              │ │
+│  │                                                                       │ │
+│  │  YOUR PORTFOLIO IMPACT:                                              │ │
+│  │                                                                       │ │
+│  │  Sleeve              Current    Impact      P&L        Contrib       │ │
+│  │  ─────────────────────────────────────────────────────────────       │ │
+│  │  Growth              58%        -18%        $-7.9M     -10.1%  🔴    │ │
+│  │  Credit              18%        -12%        $-1.7M     -2.2%         │ │
+│  │  Hedges (Crisis)     8%         -8%         $-0.6M     -0.8%   🔴    │ │
+│  │    (Duration hurt)                                                   │ │
+│  │  Hedges (Infl)       4%         +10%        $+0.3M     +0.4%   ✓     │ │
+│  │    (TIPS/cmdty)                                                      │ │
+│  │  Diversifiers        7%         -3%         $-0.2M     -0.2%         │ │
+│  │  Real Assets         3%         +5%         $+0.1M     +0.2%         │ │
+│  │  Liquidity           2%         0%          $0.0M      0.0%          │ │
+│  │  ─────────────────────────────────────────────────────────────────   │ │
+│  │  TOTAL PORTFOLIO:                          $-10.0M     -12.8%        │ │
+│  │                                                                       │ │
+│  │  💡 KEY ISSUE: Crisis hedges (duration) failed in inflation shock    │ │
+│  │     Inflation hedges (4%) too small to offset Growth losses          │ │
+│  │                                                                       │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │  COMPARISON TABLE (All Scenarios)                                     │ │
+│  │                                                                       │ │
+│  │  Scenario                Current Portfolio   Historical 60/40        │ │
+│  │  ─────────────────────────────────────────────────────────────       │ │
+│  │  2008 Financial Crisis   -28%                -24%                    │ │
+│  │  COVID-19 (Mar 2020)     -22%                -16%                    │ │
+│  │  2022 Inflation Shock    -13%                -11%                    │ │
+│  │  Stagflation             -19%                -15%                    │ │
+│  │  Monte Carlo 95% ES      -20%                -16%                    │ │
+│  │                                                                       │ │
+│  │  ⚠ Current portfolio underperforms 60/40 in most stress scenarios    │ │
+│  │     → Hedges are undersized relative to Growth exposure               │ │
+│  │     → [Review SAA in Settings ↑]                                     │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+└────────────────────────────────────────────────────────────────────────────┘
+Interactive Behaviors:
+
+Horizon radio buttons (12mo / 3yr / 5yr): Re-runs Monte Carlo, updates fan chart (shows loading spinner during calculation)
+"Select Scenario" dropdown: Changes displayed scenario, recalculates impact table
+"+ Create Custom Scenario" button: Opens modal:┌──────────────────────────────────────────┐
+│  CUSTOM SCENARIO BUILDER                 │
+│                                          │
+│  Scenario Name: [_____________________]  │
+│                                          │
+│  Asset Class Shocks (% change):          │
+│  Global Equities:     [___-15___] %      │
+│  IG Bonds:            [___-5____] %      │
+│  HY Bonds:            [___-10___] %      │
+│  Commodities:         [___+20___] %      │
+│  Gold:                [___+8____] %      │
+│  Private Equity:      [___-20___] %      │
+│  Private Credit:      [___-8____] %      │
+│                                          │
+│  [Calculate Impact]  [Save for Reuse]    │
+└──────────────────────────────────────────┘
+
+"Adjust SAA to Reduce Risk ↑" button: Scrolls to Section 2, highlights SAA targets with suggested changes pre-filled
+
+
+KEY WORKFLOW PATTERNS
+1. Initial Setup Flow:
+Step 1: Import holdings → Section 1
+        ↓
+Step 2: Classify positions → Section 1
+        ↓
+Step 3: Set client profile + SAA targets → Section 2
+        ↓
+Step 4: Configure assumptions → Section 2
+        ↓
+Step 5: Click "Calculate Risk Metrics" → Section 3 appears
+        ↓
+Step 6: Review historical → Section 3
+        ↓
+Step 7: Run stress tests → Section 4
+2. Rebalancing Review Flow:
+Step 1: Import new holdings → Section 1 updates
+        ↓
+Step 2: Check drift vs. targets → Section 1 alerts appear
+        ↓
+Step 3: If drift > tolerance → "Fix in Settings" button
+        ↓
+Step 4: Adjust SAA (if needed) → Section 2
+        ↓
+Step 5: Re-run risk calcs → Sections 3 & 4 update
+3. Stress Test "What-If" Flow:
+Step 1: Run scenario → Section 4
+        ↓
+Step 2: See poor outcome → "Key Issue" diagnosis
+        ↓
+Step 3: Click "Review SAA in Settings" → Section 2
+        ↓
+Step 4: Adjust targets (e.g., Hedges 12% → 15%)
+        ↓
+Step 5: Save → Triggers re-calc
+        ↓
+Step 6: Scroll back to Section 4 → See improved scenario outcome
+
+STATE DEPENDENCIES
+Section 1 (Portfolio Snapshot):
+
+Always visible
+Data source: Holdings CSV upload
+Blocks downstream calculations if positions are unclassified
+
+Section 2 (Settings & Assumptions):
+
+Always visible
+Independent of Section 1 completion (can set targets before holdings uploaded)
+Stores configuration for Sections 3 & 4
+
+Section 3 (Risk Metrics):
+
+Only rendered after:
+Section 1: All positions classified
+Section 2: SAA targets set
+Section 2: Historical NAV data uploaded
+User clicks "Calculate Risk Metrics"
+
+
+Shows loading spinner during calculation (~2-5 seconds)
+
+Section 4 (Stress Testing):
+
+Only rendered after:
+Section 3 calculations complete
+User clicks "Proceed to Stress Testing" OR scrolls past Section 3
+
+
+Monte Carlo runs automatically on first view
+Scenarios calculated on-demand (when dropdown changes)
+
+
+ERROR STATES & VALIDATION
+Section 1:
+⚠ "3 positions need classification" → Blocks risk calculation
+⚠ "File parse error: Row 23 missing ISIN" → Shows error banner
+✓ "All positions classified" → Enables "Continue to Settings"
+Section 2:
+⚠ "SAA targets sum to 98%" → Inline validation, red highlight
+⚠ "Max drawdown must be negative" → Field validation
+⚠ "Historical NAV required for risk analysis" → Blocks Section 3
+✓ "Settings saved" → Green toast notification
+Section 3:
+⏳ "Calculating risk metrics..." → Loading spinner overlay
+⚠ "Insufficient data (need 24mo, have 18mo)" → Shows warning, uses available
+✓ "Risk metrics updated" → Sections 3 & 4 refresh
+Section 4:
+⏳ "Running Monte Carlo (10,000 paths)..." → Progress bar
+⚠ "Custom scenario: Total must equal 100%" → Modal validation
+✓ "Stress test complete" → Results display
+
+SUMMARY: UI STRUCTURE ONLY
+4 Main Sections (Vertical Scroll):
+
+Portfolio Snapshot → Intake & classification
+Settings & Assumptions → Configure before analysis
+Risk Metrics → Historical performance (calculated)
+Stress Testing → Forward projections (calculated)
+
+Key Navigation Patterns:
+
+Jump links in fixed header (smooth scroll)
+Action buttons link sections (e.g., "Fix in Settings ↑" jumps to Section 2)
+Progressive disclosure (collapsed details, expand on-demand)
+Workflow buttons at section bottoms ("Continue →", "Calculate →")
+
+Calculation Triggers:
+
+Section 3 requires explicit "Calculate Risk Metrics" button
+Section 4 auto-calculates on first scroll-into-view
+Scenario changes recalculate immediately
+SAA changes require "Save" + manual re-trigger

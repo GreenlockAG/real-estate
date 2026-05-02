@@ -1,0 +1,121 @@
+Role: You are a product designer + financial engineer building a multi-property real-estate investor dashboard.
+Base currency: USD. Properties are in multiple countries & currencies (Miami, Dubai, Vienna, Alps Chalet, Paris, London).
+Goal: Provide an investor-grade portfolio cockpit with fast risk, return, and capital allocation insight.
+
+1. Portfolio Summary View
+
+Design a table or card-grid (Airtable-style) with visual sorting, filtering and color-coded performance.
+
+Each property is one row/card with:
+
+Field	Description
+Thumbnail	Small photo of the property
+Property Name	Custom name
+Country	Location
+Current Value (USD)	FX-converted live value
+Absolute P/L (USD)	Current value – invested capital
+IRR Since Inception	Time-weighted
+Financing Structure	e.g. 100% equity, 30% equity / 70% debt
+Risk Tag	Low / Medium / High (derived from leverage + FX + vacancy)
+Liquidity Tag	Days to exit or % illiquid
+Status	Operating / Renovation / For sale
+
+Rows should be color-coded (green → positive, red → negative, amber → watchlist).
+Cards should support sparkline mini-charts for value trend.
+
+2. Property Passport Page
+
+Layout:
+
+Left panel (30%) – pastel background
+
+Right panel (70%) – light grey canvas
+
+Content blocks on right are white rounded cards
+
+Left Panel (Sticky Property Identity)
+
+Replicate key summary info:
+
+Thumbnail
+
+Name
+
+Country
+
+Current Value (USD + local)
+
+P/L (USD + %)
+
+IRR
+
+Financing structure
+
+FX exposure
+
+Leverage
+
+Risk score
+
+Right Panel – Vertical Panes
+Pane 1 — Valuation
+
+Bar chart
+
+X-axis: Last 12 quarters
+
+Y-axis: M2M value (USD)
+
+Bars colored from brand palette
+
+Tooltip: local currency + FX rate
+
+Pane 2 — Performance
+
+Line chart
+
+X-axis: quarters
+
+Y-axis: % return
+
+Bold line: Property IRR
+
+Light line: Opportunity cost (3-month USD deposit applied to same cash flows)
+
+Pane 3 — Growth Rate
+
+Line chart
+
+X-axis: quarters
+
+Y-axis: annualized %
+
+Bold: property growth
+
+Light: regional real-estate benchmark
+
+Pane 4 — Profit & Loss
+
+Expandable P&L table
+
+Rows:
+
+Rental income
+
+Operating costs
+
+Maintenance (expandable → pool, painting, HVAC, etc.)
+
+Interest
+
+FX adjustment
+
+Net profit
+
+Columns:
+
+Quarters
+
+Local currency values
+
+Final column: USD totals
